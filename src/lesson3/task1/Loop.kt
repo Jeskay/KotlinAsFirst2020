@@ -2,6 +2,7 @@
 
 package lesson3.task1
 
+import java.time.temporal.TemporalAmount
 import kotlin.math.sqrt
 
 // Урок 3: циклы
@@ -80,21 +81,38 @@ fun digitNumber(n: Int): Int = TODO()
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = TODO()
+fun fib(n: Int): Int {
+    fun findfib(n1: Int, n2: Int, limit: Int, current: Int) : Int {
+        return if (current == limit) n1
+        else findfib(n2 + n1, n1, limit, current + 1)
+    }
+    return when (n) {
+        in 1..2 -> 1
+        else -> findfib(1, 1, n, 2)
+    }
+}
 
 /**
  * Простая (2 балла)
  *
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
-fun minDivisor(n: Int): Int = TODO()
+fun minDivisor(n: Int): Int {
+    for (m in 2..n)
+        if (n % m == 0) return m
+    return n
+}
 
 /**
  * Простая (2 балла)
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int = TODO()
+fun maxDivisor(n: Int): Int {
+    for (m in (n - 1) downTo 1)
+        if (n % m == 0) return m
+    return 1
+}
 
 /**
  * Простая (2 балла)
