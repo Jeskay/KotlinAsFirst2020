@@ -3,7 +3,10 @@
 package lesson3.task1
 
 import java.time.temporal.TemporalAmount
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 import kotlin.math.sqrt
+import kotlin.math.tan
 
 // Урок 3: циклы
 // Максимальное количество баллов = 9
@@ -73,7 +76,13 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int = TODO()
+fun digitNumber(n: Int): Int {
+    fun noLoops(count: Int, current: Int): Int {
+        return if (current / 10 != 0) noLoops(count + 1, current / 10)
+        else count
+    }
+    return noLoops(1, n)
+}
 
 /**
  * Простая (2 балла)
@@ -82,13 +91,13 @@ fun digitNumber(n: Int): Int = TODO()
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
 fun fib(n: Int): Int {
-    fun findfib(n1: Int, n2: Int, limit: Int, current: Int) : Int {
+    fun noLoops(n1: Int, n2: Int, limit: Int, current: Int): Int {
         return if (current == limit) n1
-        else findfib(n2 + n1, n1, limit, current + 1)
+        else noLoops(n2 + n1, n1, limit, current + 1)
     }
     return when (n) {
         in 1..2 -> 1
-        else -> findfib(1, 1, n, 2)
+        else -> noLoops(1, 1, n, 2)
     }
 }
 
@@ -98,7 +107,7 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    for (m in 2..n)
+    for (m in 2..n)//так не честно StackOverFlow
         if (n % m == 0) return m
     return n
 }
@@ -109,7 +118,7 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    for (m in (n - 1) downTo 1)
+    for (m in (n - 1) downTo 1)//так не честно StackOverFlow
         if (n % m == 0) return m
     return 1
 }
@@ -130,7 +139,16 @@ fun maxDivisor(n: Int): Int {
  * Написать функцию, которая находит, сколько шагов требуется для
  * этого для какого-либо начального X > 0.
  */
-fun collatzSteps(x: Int): Int = TODO()
+fun collatzSteps(x: Int): Int {
+    var counter = 0//так не честно
+    var number = x
+    while (number != 1) {
+        if (number % 2 == 0) number /= 2
+        else number = 3 * number + 1
+        counter++
+    }
+    return counter
+}
 
 /**
  * Средняя (3 балла)
@@ -138,7 +156,15 @@ fun collatzSteps(x: Int): Int = TODO()
  * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
  * минимальное число k, которое делится и на m и на n без остатка
  */
-fun lcm(m: Int, n: Int): Int = TODO()
+fun lcm(m: Int, n: Int): Int {
+    fun noLoops(a: Int, b: Int): Int {
+        if (a % b == 0) return b
+        if (b % a == 0) return a
+        return if (a >= b) noLoops(a % b, b)
+        else noLoops(a, b % a)
+    }
+    return m * n / noLoops(m, n)
+}
 
 /**
  * Средняя (3 балла)
@@ -147,7 +173,15 @@ fun lcm(m: Int, n: Int): Int = TODO()
  * Взаимно простые числа не имеют общих делителей, кроме 1.
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
-fun isCoPrime(m: Int, n: Int): Boolean = TODO()
+fun isCoPrime(m: Int, n: Int): Boolean {
+    fun noLoops(a: Int, b: Int): Int {
+        if (a % b == 0) return b
+        if (b % a == 0) return a
+        return if (a >= b) noLoops(a % b, b)
+        else noLoops(a, b % a)
+    }
+    return noLoops(m, n) == 1
+}
 
 /**
  * Средняя (3 балла)
@@ -156,7 +190,13 @@ fun isCoPrime(m: Int, n: Int): Boolean = TODO()
  * то есть, существует ли такое целое k, что m <= k*k <= n.
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
-fun squareBetweenExists(m: Int, n: Int): Boolean = TODO()
+fun squareBetweenExists(m: Int, n: Int): Boolean {
+    val sq1 = sqrt(n.toDouble())
+    val sq2 = sqrt(m.toDouble())
+    val n1 = sq1.toInt()
+    val n2 = sq2.toInt()
+    return sq1 % 1 == 0.0 || sq2 % 1 == 0.0 || n1 - n2 >= 1
+}
 
 /**
  * Средняя (3 балла)
@@ -165,7 +205,16 @@ fun squareBetweenExists(m: Int, n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun revert(n: Int): Int = TODO()
+fun revert(n: Int): Int {
+    var number = n
+    fun noLoops(current: Int): Int {
+        if (number == 0) return current
+        val x = number % 10
+        number /= 10
+        return noLoops(current * 10 + x)
+    }
+    return noLoops(0)
+}
 
 /**
  * Средняя (3 балла)
@@ -198,6 +247,7 @@ fun hasDifferentDigits(n: Int): Boolean = TODO()
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
 fun sin(x: Double, eps: Double): Double = TODO()
+
 
 /**
  * Средняя (4 балла)

@@ -3,6 +3,8 @@
 package lesson2.task1
 
 import lesson1.task1.discriminant
+import kotlin.math.abs
+import kotlin.math.acos
 import kotlin.math.max
 import kotlin.math.sqrt
 
@@ -70,7 +72,7 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  */
 fun ageDescription(age: Int): String =
     when {
-        age % 100 in 2..20 -> "$age лет"
+        age % 100 in 5..20 -> "$age лет"
         age % 10 == 1 -> "$age год"
         age % 10 in 2..4 -> "$age года"
         else -> "$age лет"
@@ -112,7 +114,16 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = TODO()
+): Int {
+    val rook1 = (rookX1 == kingX || rookY1 == kingY)
+    val rook2 = (rookX2 == kingX || rookY2 == kingY)
+    return when {
+        rook1 && rook2 -> 3
+        rook1 -> 1
+        rook2 -> 2
+        else -> 0
+    }
+}
 
 /**
  * Простая (2 балла)
@@ -128,7 +139,16 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = TODO()
+): Int {
+    val rook = rookX == kingX || rookY == kingY
+    val bishop = abs(bishopX - kingX) == abs(bishopY - kingY)
+    return when {
+        rook && bishop -> 3
+        rook -> 1
+        bishop -> 2
+        else -> 0
+    }
+}
 
 /**
  * Простая (2 балла)
@@ -138,7 +158,17 @@ fun rookOrBishopThreatens(
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
+fun triangleKind(a: Double, b: Double, c: Double): Int {
+    val a1 = ((b * b + c * c - a * a) / (2 * b * c))
+    val a2 = ((a * a + c * c - b * b) / (2 * a * c))
+    val a3 = ((b * b + a * a - c * c) / (2 * b * a))
+    return when {
+        (a + b < c) || (b + c < a) || (a + c < b) -> -1
+        a1 == 0.0 || a2 == 0.0 || a3 == 0.0 -> 1
+        a1 < 0 || a2 < 0 || a3 < 0 -> 2
+        else -> 0
+    }
+}
 
 /**
  * Средняя (3 балла)
