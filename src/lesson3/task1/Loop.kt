@@ -264,12 +264,13 @@ fun hasDifferentDigits(n: Int): Boolean {
  */
 fun sin(x: Double, eps: Double): Double {
     fun checkBullshit(number: Double): Double {
-        if (number <= 2 * PI) return number
-        return checkBullshit(number - 2 * PI)
+        if (abs(number) <= 2 * PI) return number
+        return if (number >= 0) checkBullshit(number - 2 * PI)
+        else checkBullshit(number + 2 * PI)
     }
 
     val newX = checkBullshit(x)
-    fun noLoops(prev: Double, counter: Int, sum: Double): Double {
+    tailrec fun noLoops(prev: Double, counter: Int, sum: Double): Double {
         val current = (-1) * prev * newX * newX / (2 * counter * (2 * counter + 1))
         if (abs(current) < eps) return sum + current
         return noLoops(current, counter + 1, sum + current)
@@ -289,8 +290,9 @@ fun sin(x: Double, eps: Double): Double {
  */
 fun cos(x: Double, eps: Double): Double {
     fun checkBullshit(number: Double): Double {
-        if (number <= 2 * PI) return number
-        return checkBullshit(number - 2 * PI)
+        if (abs(number) <= 2 * PI) return number
+        return if (number >= 0) checkBullshit(number - 2 * PI)
+        else checkBullshit(number + 2 * PI)
     }
 
     val newX = checkBullshit(x)
@@ -317,7 +319,7 @@ fun squareSequenceDigit(n: Int): Int {
         return find(number % coef, toFind, coef / 10, count + 1)
     }
 
-    fun noLoops(number: Int, amount: Int, coef: Int, counter: Int): Int {
+    tailrec fun noLoops(number: Int, amount: Int, coef: Int, counter: Int): Int {
         val square = number * number
         var newcoef = coef
         var newamount = amount
@@ -348,7 +350,7 @@ fun fibSequenceDigit(n: Int): Int {
         return find(number % coef, toFind, coef / 10, count + 1)
     }
 
-    fun noLoops(prev1: Int, prev2: Int, amount: Int, coef: Int, counter: Int): Int {
+    tailrec fun noLoops(prev1: Int, prev2: Int, amount: Int, coef: Int, counter: Int): Int {
         val current = prev1 + prev2
         var newcoef = coef
         var newamount = amount
