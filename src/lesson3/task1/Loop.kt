@@ -3,10 +3,7 @@
 package lesson3.task1
 
 import java.time.temporal.TemporalAmount
-import kotlin.math.roundToInt
-import kotlin.math.roundToLong
-import kotlin.math.sqrt
-import kotlin.math.tan
+import kotlin.math.*
 
 // Урок 3: циклы
 // Максимальное количество баллов = 9
@@ -107,9 +104,11 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    for (m in 2..n)//так не честно StackOverFlow
-        if (n % m == 0) return m
-    return n
+    tailrec fun noLoops(number: Int): Int {
+        if (n % number == 0) return number
+        return noLoops(number + 1)
+    }
+    return noLoops(2)
 }
 
 /**
@@ -118,9 +117,11 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    for (m in (n - 1) downTo 1)//так не честно StackOverFlow
-        if (n % m == 0) return m
-    return 1
+    tailrec fun noLoops(number: Int): Int{
+        if (n % number == 0) return number
+        return noLoops(number - 1)
+    }
+    return noLoops(n - 1)
 }
 
 /**
@@ -140,14 +141,11 @@ fun maxDivisor(n: Int): Int {
  * этого для какого-либо начального X > 0.
  */
 fun collatzSteps(x: Int): Int {
-    var counter = 0//так не честно
-    var number = x
-    while (number != 1) {
-        if (number % 2 == 0) number /= 2
-        else number = 3 * number + 1
-        counter++
+    tailrec fun noLoops(counter: Int, number: Int): Int{
+        if (number == 1) return counter
+        return noLoops(counter + 1, if (number % 2 == 0) number / 2 else number * 3 + 1)
     }
-    return counter
+    return noLoops(0, x)
 }
 
 /**
@@ -225,7 +223,18 @@ fun revert(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = TODO()
+fun isPalindrome(n: Int): Boolean {
+    var coef = 1
+    var halfnumber: Int = 0
+    fun noLoops(current: Int): Boolean {
+        if (current / coef < 1) return halfnumber == current
+        if (current / coef < 10) return halfnumber == (current / 10)
+        coef *= 10
+        halfnumber = halfnumber * 10 + (current % 10)
+        return noLoops(current / 10)
+    }
+    return noLoops(n)
+}
 
 /**
  * Средняя (3 балла)
@@ -235,7 +244,14 @@ fun isPalindrome(n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun hasDifferentDigits(n: Int): Boolean = TODO()
+fun hasDifferentDigits(n: Int): Boolean {
+    fun noLoops(number: Int, toCompare: Int): Boolean {
+        if (number == 0) return false
+        if (number % 10 != toCompare) return true
+        return noLoops(number / 10, toCompare)
+    }
+    return noLoops(n, n % 10)
+}
 
 /**
  * Средняя (4 балла)
@@ -246,7 +262,20 @@ fun hasDifferentDigits(n: Int): Boolean = TODO()
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
-fun sin(x: Double, eps: Double): Double = TODO()
+fun sin(x: Double, eps: Double): Double {
+    fun checkBullshit(number: Double): Double {
+        if (number <= 2 * PI) return number
+        return checkBullshit(number - 2 * PI)
+    }
+
+    val newX = checkBullshit(x)
+    fun noLoops(prev: Double, counter: Int, sum: Double): Double {
+        val current = (-1) * prev * newX * newX / (2 * counter * (2 * counter + 1))
+        if (abs(current) < eps) return sum + current
+        return noLoops(current, counter + 1, sum + current)
+    }
+    return noLoops(newX, 1, newX)
+}
 
 
 /**
@@ -258,7 +287,20 @@ fun sin(x: Double, eps: Double): Double = TODO()
  * Подумайте, как добиться более быстрой сходимости ряда при больших значениях x.
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
-fun cos(x: Double, eps: Double): Double = TODO()
+fun cos(x: Double, eps: Double): Double {
+    fun checkBullshit(number: Double): Double {
+        if (number <= 2 * PI) return number
+        return checkBullshit(number - 2 * PI)
+    }
+
+    val newX = checkBullshit(x)
+    fun noLoops(prev: Double, counter: Int, sum: Double): Double {
+        val current = (-1) * prev * newX * newX / (2 * counter * (2 * counter - 1))
+        if (abs(current) < eps) return sum + current
+        return noLoops(current, counter + 1, sum + current)
+    }
+    return noLoops(1.0, 1, 1.0)
+}
 
 /**
  * Сложная (4 балла)
@@ -269,7 +311,27 @@ fun cos(x: Double, eps: Double): Double = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = TODO()
+fun squareSequenceDigit(n: Int): Int {
+    fun find(number: Int, toFind: Int, coef: Int, count: Int): Int{
+        if (count == toFind) return number / coef
+        return find(number % coef, toFind, coef / 10, count + 1)
+    }
+
+    fun noLoops(number: Int, amount: Int, coef: Int, counter: Int): Int {
+        val square = number * number
+        var newcoef = coef
+        var newamount = amount
+        if (square / coef >= 10) {
+            newcoef *= 10
+            newamount++
+        }
+        if (n in counter..(counter + newamount)) {
+            return find(square, n - counter, newcoef, 1)
+        }
+        return noLoops(number + 1, newamount, newcoef, counter + newamount)
+    }
+    return noLoops(1, 1, 1, 0)
+}
 
 /**
  * Сложная (5 баллов)
@@ -280,4 +342,27 @@ fun squareSequenceDigit(n: Int): Int = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int = TODO()
+fun fibSequenceDigit(n: Int): Int {
+    fun find(number: Int, toFind: Int, coef: Int, count: Int): Int{
+        if (count == toFind) return number / coef
+        return find(number % coef, toFind, coef / 10, count + 1)
+    }
+
+    fun noLoops(prev1: Int, prev2: Int, amount: Int, coef: Int, counter: Int): Int {
+        val current = prev1 + prev2
+        var newcoef = coef
+        var newamount = amount
+        if (current / coef >= 10) {
+            newcoef *= 10
+            newamount++
+        }
+        if (n in counter..(counter + newamount)) {
+            return find(current, n - counter, newcoef, 1)
+        }
+        return noLoops(prev2, current, newamount, newcoef, counter + newamount)
+    }
+    return when (n) {
+        in 1..2 -> 1
+        else -> noLoops(1, 1, 1, 1, 2)
+    }
+}
