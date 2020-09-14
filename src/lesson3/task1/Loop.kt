@@ -161,7 +161,7 @@ fun lcm(m: Int, n: Int): Int {
         return if (a >= b) noLoops(a % b, b)
         else noLoops(a, b % a)
     }
-    return m * n / noLoops(m, n)
+    return m / noLoops(m, n) * n
 }
 
 /**
@@ -225,7 +225,7 @@ fun revert(n: Int): Int {
  */
 fun isPalindrome(n: Int): Boolean {
     var coef = 1
-    var halfnumber: Int = 0
+    var halfnumber = 0
     fun noLoops(current: Int): Boolean {
         if (current / coef < 1) return halfnumber == current
         if (current / coef < 10) return halfnumber == (current / 10)
