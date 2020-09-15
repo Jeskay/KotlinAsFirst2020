@@ -437,7 +437,7 @@ fun russian(n: Int): String {
     fun getThousand(number: Int): String = when {
         number % 100 in 11..19 -> "тысяч"
         number % 10 == 1 -> "тысяча"
-        number % 10 == 4 || number % 10 == 2 -> "тысячи"
+        number % 10 in 2..4 -> "тысячи"
         else -> "тысяч"
     }
 
