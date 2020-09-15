@@ -454,7 +454,7 @@ fun russian(n: Int): String {
                 var res = ""
                 if (number % 10 != 0) res = " ${numbers[number % 10]}"
                 if (number % 100 in 11..19) res = " ${otherNumbers[number % 100]}"
-                if (number % 100 >= 20) res = " ${getDozens(number / 10 % 10)}$res"
+                if (number % 100 >= 20 || number % 100 == 10) res = " ${getDozens(number / 10 % 10)}$res"
                 res = "${getHundred(number / 100)}$res"
                 return res
             }
