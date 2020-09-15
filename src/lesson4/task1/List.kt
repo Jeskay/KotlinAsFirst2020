@@ -197,7 +197,7 @@ fun polynom(p: List<Int>, x: Int): Int {
 fun accumulate(list: MutableList<Int>): MutableList<Int> {
     if (list.isEmpty()) return list
     var sum = list.sum()
-    for (i in list.size - 1 downTo 0){
+    for (i in list.size - 1 downTo 0) {
         val x = list[i]
         list[i] = sum
         sum -= x
@@ -237,7 +237,23 @@ fun factorize(n: Int): List<Int> {
  * Результат разложения вернуть в виде строки, например 75 -> 3*5*5
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
-fun factorizeToString(n: Int): String = TODO()
+fun factorizeToString(n: Int): String {
+    var number = n
+    var list = ""
+    tailrec fun divider(counter: Int) {
+        if (counter == number) return
+        if (number % counter == 0) {
+            list += "$counter*"
+            number /= counter
+            divider(2)
+            return
+        }
+        divider(counter + 1)
+    }
+    divider(2)
+    list += number.toString()
+    return list
+}
 
 /**
  * Средняя (3 балла)
@@ -246,7 +262,20 @@ fun factorizeToString(n: Int): String = TODO()
  * Результат перевода вернуть в виде списка цифр в base-ичной системе от старшей к младшей,
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
-fun convert(n: Int, base: Int): List<Int> = TODO()
+fun convert(n: Int, base: Int): List<Int> {
+    val arr = mutableListOf<Int>()
+    fun divider(number: Int) {
+        if (number < base) {
+            arr.add(number)
+            return
+        }
+        arr.add(number % base)
+        divider(number / base)
+    }
+    divider(n)
+    arr.reverse()
+    return arr.toList()
+}
 
 /**
  * Сложная (4 балла)
@@ -259,7 +288,21 @@ fun convert(n: Int, base: Int): List<Int> = TODO()
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, n.toString(base) и подобные), запрещается.
  */
-fun convertToString(n: Int, base: Int): String = TODO()
+fun convertToString(n: Int, base: Int): String {
+    var result = ""
+    fun divider(number: Int) {
+        if (number < base) {
+            if (number % base > 9) result += ('a' + (number % base) - 10)
+            else result += number % base
+            return
+        }
+        if (number % base > 9) result += ('a' + (number % base) - 10)
+        else result += number % base
+        divider(number / base)
+    }
+    divider(n)
+    return result.reversed()
+}
 
 /**
  * Средняя (3 балла)
@@ -268,7 +311,15 @@ fun convertToString(n: Int, base: Int): String = TODO()
  * из системы счисления с основанием base в десятичную.
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
-fun decimal(digits: List<Int>, base: Int): Int = TODO()
+fun decimal(digits: List<Int>, base: Int): Int {
+    var result = 0
+    var yamaha = 1
+    digits.reversed().forEach {
+        result += it * yamaha
+        yamaha *= base
+    }
+    return result
+}
 
 /**
  * Сложная (4 балла)
@@ -282,7 +333,18 @@ fun decimal(digits: List<Int>, base: Int): Int = TODO()
  * Использовать функции стандартной библиотеки, напрямую и полностью решающие данную задачу
  * (например, str.toInt(base)), запрещается.
  */
-fun decimalFromString(str: String, base: Int): Int = TODO()
+fun decimalFromString(str: String, base: Int): Int {
+    var result = 0
+    var coif = 1
+    str.reversed().forEach {
+        val x: Int
+        if (!it.isDigit()) x = (it - 'a') + 10
+        else x = it.toString().toInt()
+        result += x * coif
+        coif *= base
+    }
+    return result
+}
 
 /**
  * Сложная (5 баллов)
