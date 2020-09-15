@@ -146,7 +146,9 @@ fun mean(list: List<Double>): Double = if (list.isNotEmpty()) list.sum() / list.
 fun center(list: MutableList<Double>): MutableList<Double> {
     if (list.isEmpty()) return list
     val cantor: Double = list.sum() / list.size
-    list.map { it - cantor }
+    list.replaceAll {
+        it - cantor
+    }
     return list
 }
 
@@ -338,8 +340,8 @@ fun decimalFromString(str: String, base: Int): Int {
     var coif = 1
     str.reversed().forEach {
         val x: Int
-        if (!it.isDigit()) x = (it - 'a') + 10
-        else x = it.toString().toInt()
+        x = if (!it.isDigit()) (it - 'a') + 10
+        else it.toString().toInt()
         result += x * coif
         coif *= base
     }
@@ -354,7 +356,35 @@ fun decimalFromString(str: String, base: Int): Int {
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun roman(n: Int): String = TODO()
+fun roman(n: Int): String {
+    var koef = 1
+    var result = ""
+    val list =
+        mapOf(Pair(1, "I"), Pair(5, "V"), Pair(10, "X"), Pair(50, "L"), Pair(100, "C"), Pair(500, "D"), Pair(1000, "M"))
+
+    fun getRomanNumber(number: Int, times: Int): String {
+        var output = ""
+        for (i in 1..times)
+            output += list[number]
+        return output
+    }
+
+    fun divider(number: Int) {
+        if (number == 0) return
+        result += when (number % 10) {
+            in 1..3 -> getRomanNumber(koef, number % 10)
+            0 -> ""
+            4 -> list[koef * 5] + list[koef]
+            5 -> list[koef * 5]
+            9 -> list[koef * 10] + list[koef]
+            else -> getRomanNumber(koef, (number % 10) - 5) + list[koef * 5]
+        }
+        koef *= 10
+        divider(number / 10)
+    }
+    divider(n)
+    return result.reversed()
+}
 
 /**
  * Очень сложная (7 баллов)
@@ -363,4 +393,85 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+fun russian(n: Int): String {
+    val numbers =
+        mapOf(
+            Pair(1, "один"),
+            Pair(2, "два"),
+            Pair(3, "три"),
+            Pair(4, "четыре"),
+            Pair(5, "пять"),
+            Pair(6, "шесть"),
+            Pair(7, "семь"),
+            Pair(8, "восемь"),
+            Pair(9, "девять")
+        )
+    val otherNumbers =
+        mapOf(
+            Pair(11, "одиннадцать"),
+            Pair(12, "двенадцать"),
+            Pair(13, "тринадцать"),
+            Pair(14, "четырнадцать"),
+            Pair(15, "пятнадцать"),
+            Pair(16, "шестнадцать"),
+            Pair(17, "семнадцать"),
+            Pair(18, "восемнадцать"),
+            Pair(19, "девятнадцать")
+        )
+
+    fun getHundred(number: Int): String = when (number) {
+        1 -> "сто"
+        2 -> "двести"
+        3, 4 -> numbers[number] + "ста"
+        else -> numbers[number] + "сот"
+    }
+
+    fun getDozens(number: Int): String = when (number) {
+        1 -> "десять"
+        2, 3 -> numbers[number] + "дцать"
+        4 -> "сорок"
+        9 -> "девяносто"
+        else -> numbers[number] + "десят"
+    }
+
+    fun getThousand(number: Int): String = when {
+        number % 100 in 11..19 -> "тысяч"
+        number % 10 == 1 -> "тысяча"
+        number % 10 == 2 -> "тысячи"
+        else -> "тысяч"
+    }
+
+    fun getNumber(number: Int): String {
+        return when (number) {
+            0 -> ""
+            in 1..9 -> "${numbers[number]}"
+            in 11..19 -> "${otherNumbers[number]}"
+            10, in 20..99 -> {
+                return if (number % 10 != 0) "${getDozens(number / 10)} ${numbers[number % 10]}"
+                else getDozens(number / 10)
+            }
+            in 100..999 -> {
+                var res = ""
+                if (number % 10 != 0) res = " ${numbers[number % 10]}"
+                if (number % 100 in 11..19) res = " ${otherNumbers[number % 100]}"
+                if (number % 100 >= 20) res = " ${getDozens(number / 10 % 10)}$res"
+                res = "${getHundred(number / 100)}$res"
+                return res
+            }
+            else -> {
+                var firstdigit = "" + getNumber(number / 1000)
+                if (firstdigit[firstdigit.length - 1] == 'а' && firstdigit[firstdigit.length - 2] == 'в') {
+                    firstdigit = firstdigit.substring(0..firstdigit.length - 2) + 'е'
+                }
+                if (firstdigit[firstdigit.length - 1] == 'н' && firstdigit[firstdigit.length - 2] == 'и') {
+                    firstdigit = firstdigit.substring(0..firstdigit.length - 3) + "на"
+                }
+                val secondPart = getNumber(number % 1000)
+                return "$firstdigit ${getThousand(number / 1000)}${if (secondPart.isNotEmpty()) " $secondPart" else ""}"
+            }
+        }
+    }
+
+    val result = getNumber(n)
+    return if (result.isEmpty()) "" else result
+}
