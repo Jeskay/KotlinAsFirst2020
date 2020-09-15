@@ -145,8 +145,8 @@ fun mean(list: List<Double>): Double = if (list.isNotEmpty()) list.sum() / list.
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
     if (list.isEmpty()) return list
-    val cntr: Double = list.sum() / list.size
-    list.map { it - cntr }
+    val cantor: Double = list.sum() / list.size
+    list.map { it - cantor }
     return list
 }
 
