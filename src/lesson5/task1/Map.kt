@@ -302,17 +302,23 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     var max = Pair(emptySet<String>(), -1)
-    fun findList(freeCapacity: Int, vulnerability: Int, list: MutableList<String>) {
-        treasures.forEach{
+    fun findList(
+        freeCapacity: Int,
+        vulnerability: Int,
+        leftTreasures: Map<String, Pair<Int, Int>>,
+        list: MutableList<String>
+    ) {
+        leftTreasures.forEach {
             if (it.value.first <= freeCapacity) {
                 val newcapacity = freeCapacity - it.value.first
                 val newvulnerability = vulnerability + it.value.second
+                val newTresures = leftTreasures.minus(it.key)
                 list.add(it.key)
-                findList(newcapacity, newvulnerability, list)
+                findList(newcapacity, newvulnerability, newTresures, list)
             }
         }
         if (vulnerability > max.second) max = Pair(list.toSet(), vulnerability)
     }
-    findList(capacity, 0, mutableListOf<String>())
+    findList(capacity, 0, treasures, mutableListOf<String>())
     return max.first
 }
