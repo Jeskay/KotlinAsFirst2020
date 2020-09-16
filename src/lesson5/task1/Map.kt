@@ -306,15 +306,15 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         freeCapacity: Int,
         vulnerability: Int,
         leftTreasures: Map<String, Pair<Int, Int>>,
-        list: MutableList<String>
+        list: List<String>
     ) {
         leftTreasures.forEach {
             if (it.value.first <= freeCapacity) {
                 val newcapacity = freeCapacity - it.value.first
                 val newvulnerability = vulnerability + it.value.second
-                val newTresures = leftTreasures.minus(it.key)
-                list.add(it.key)
-                findList(newcapacity, newvulnerability, newTresures, list)
+                val newTreasures = leftTreasures.minus(it.key)
+                val newList = list.plus(it.key)
+                findList(newcapacity, newvulnerability, newTreasures, newList)
             }
         }
         if (vulnerability > max.second) max = Pair(list.toSet(), vulnerability)
