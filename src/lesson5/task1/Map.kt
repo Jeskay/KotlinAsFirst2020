@@ -99,7 +99,14 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  *   buildGrades(mapOf("Марат" to 3, "Семён" to 5, "Михаил" to 5))
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
-fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> = TODO()
+fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
+    val result = mutableMapOf<Int, MutableList<String>>()
+    grades.forEach { (student, mark) ->
+        if (result.keys.contains(mark)) result[mark]!!.add(student)
+        else result.put(mark, mutableListOf(student))
+    }
+    return result
+}
 
 /**
  * Простая (2 балла)
@@ -111,7 +118,13 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> = TODO()
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")) -> true
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
-fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
+fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
+    a.forEach { (key, value) ->
+        if (!b.containsKey(key)) return false
+        if (b[key] != value) return false
+    }
+    return true
+}
 
 /**
  * Простая (2 балла)
@@ -128,7 +141,9 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
  *     -> a changes to mutableMapOf() aka becomes empty
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
-    TODO()
+    b.forEach { key, value ->
+        if (a.containsKey(key) && a[key] == value) a.remove(key)
+    }
 }
 
 /**
@@ -138,7 +153,13 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>) {
  * В выходном списке не должно быть повторяюихся элементов,
  * т. е. whoAreInBoth(listOf("Марат", "Семён, "Марат"), listOf("Марат", "Марат")) == listOf("Марат")
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
+fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
+    val result = mutableListOf<String>()
+    a.forEach {
+        if (b.contains(it) && !result.contains(it)) result.add(it)
+    }
+    return result
+}
 
 /**
  * Средняя (3 балла)
@@ -248,7 +269,7 @@ fun hasAnagrams(words: List<String>): Boolean = TODO()
  *     mapOf(
  *       "Marat" to setOf("Mikhail", "Sveta"),
  *       "Sveta" to setOf("Marat"),
- *       "Mikhail" to setOf("Sveta"),
+ *       "Mikhail" to setOf("Sveta"),x
  *       "Friend" to setOf("GoodGnome"),
  *       "EvilGnome" to setOf()
  *     )
@@ -289,7 +310,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
         )
         arr[num] = counter
     }
-    return Pair(-1,-1)
+    return Pair(-1, -1)
 }
 
 /**
@@ -314,7 +335,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    var max = Pair(emptySet<String>(), -1)
+    var maximum = Pair(emptySet<String>(), -1)
     fun findList(
         freeCapacity: Int,
         vulnerability: Int,
@@ -330,8 +351,8 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 findList(newcapacity, newvulnerability, newTreasures, newList)
             }
         }
-        if (vulnerability > max.second) max = Pair(list.toSet(), vulnerability)
+        if (vulnerability > maximum.second) maximum = Pair(list.toSet(), vulnerability)
     }
     findList(capacity, 0, treasures, mutableListOf<String>())
-    return max.first
+    return maximum.first
 }
