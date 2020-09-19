@@ -178,7 +178,16 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  *     mapOf("Emergency" to "911", "Police" to "02")
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
-fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> = TODO()
+fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
+    val result = mutableMapOf<String, String>()
+    result.putAll(mapA)
+    for ((key, value1) in mapB) {
+        if (!result.containsKey(key))
+            result.put(key, value1)
+        else if (!result[key]!!.contains(value1)) result[key] += ", ${value1}"
+    }
+    return result
+}
 
 /**
  * Средняя (4 балла)
@@ -190,7 +199,16 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  *   averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0))
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
-fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> = TODO()
+fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
+    val result = mutableMapOf<String, Double>()
+    for ((company) in stockPrices) {
+        if (result.containsKey(company)) continue
+        val different = stockPrices.filter { it.first == company }
+        val average = different.sumOf { it.second } / different.size
+        result.put(company, average)
+    }
+    return result
+}
 
 /**
  * Средняя (4 балла)
@@ -207,7 +225,16 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *     "печенье"
  *   ) -> "Мария"
  */
-fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? = TODO()
+fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
+    var min = Pair("", Double.MAX_VALUE)
+    for ((key, value) in stuff) {
+        if (value.first != kind)
+            continue
+        if (min.second > value.second)
+            min = Pair(key, value.second)
+    }
+    return if (min.first == "") null else min.first
+}
 
 /**
  * Средняя (3 балла)
@@ -218,7 +245,12 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
+fun canBuildFrom(chars: List<Char>, word: String): Boolean {
+    word.forEach {
+        if (!chars.contains(it)) return false
+    }
+    return true
+}
 
 /**
  * Средняя (4 балла)
@@ -232,7 +264,14 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
  * Например:
  *   extractRepeats(listOf("a", "b", "a")) -> mapOf("a" to 2)
  */
-fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
+fun extractRepeats(list: List<String>): Map<String, Int> {
+    val result = mutableMapOf<String, Int>()
+    list.forEach {
+        if (result.containsKey(it)) result[it] = result[it]!! + 1
+        else result.put(it, 1)
+    }
+    return result.filter { it.value > 1 }
+}
 
 /**
  * Средняя (3 балла)
@@ -246,7 +285,17 @@ fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-fun hasAnagrams(words: List<String>): Boolean = TODO()
+fun hasAnagrams(words: List<String>): Boolean {
+    val extra = mutableListOf<String>()
+    for (item in words) {
+        extra.add(item)
+        for (toCompare in words.minus(extra)) {
+            if (item.toSortedSet() == toCompare.toSortedSet())
+                return true
+        }
+    }
+    return false
+}
 
 /**
  * Сложная (5 баллов)
@@ -353,6 +402,10 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
         if (vulnerability > maximum.second) maximum = Pair(list.toSet(), vulnerability)
     }
-    findList(capacity, 0, treasures, mutableListOf<String>())
+    try {
+        findList(capacity, 0, treasures, mutableListOf<String>())
+    } catch (e: Exception) {
+        return maximum.first
+    }
     return maximum.first
 }
