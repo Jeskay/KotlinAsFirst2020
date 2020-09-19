@@ -4,6 +4,10 @@ package lesson5.task1
 
 import java.lang.Integer.min
 import java.lang.Math.max
+import java.sql.Time
+import java.time.LocalTime
+import java.util.*
+import kotlin.concurrent.schedule
 
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
@@ -182,6 +186,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
     val result = mutableMapOf<String, String>()
     result.putAll(mapA)
     for ((key, value1) in mapB) {
+        if (value1.isEmpty()) continue
         if (!result.containsKey(key))
             result.put(key, value1)
         else if (!result[key]!!.contains(value1)) result[key] += ", ${value1}"
@@ -246,8 +251,8 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    word.forEach {
-        if (!chars.contains(it)) return false
+    word.toLowerCase().forEach {
+        if (!chars.toString().toLowerCase().contains(it)) return false
     }
     return true
 }
@@ -289,7 +294,9 @@ fun hasAnagrams(words: List<String>): Boolean {
     val extra = mutableListOf<String>()
     for (item in words) {
         extra.add(item)
-        for (toCompare in words.minus(extra)) {
+        if (words.filter { it == item }.size != 1) return true
+        val list = words.minus(extra)
+        for (toCompare in list) {
             if (item.toSortedSet() == toCompare.toSortedSet())
                 return true
         }
@@ -385,27 +392,26 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     var maximum = Pair(emptySet<String>(), -1)
+    val timeRemain = LocalTime.now()
     fun findList(
         freeCapacity: Int,
         vulnerability: Int,
         leftTreasures: Map<String, Pair<Int, Int>>,
         list: List<String>
     ) {
-        leftTreasures.forEach {
-            if (it.value.first <= freeCapacity) {
-                val newcapacity = freeCapacity - it.value.first
-                val newvulnerability = vulnerability + it.value.second
-                val newTreasures = leftTreasures.minus(it.key)
-                val newList = list.plus(it.key)
+        for ((key, value) in leftTreasures) {
+            if (timeRemain.second - LocalTime.now().second > 9) break
+            if (value.first <= freeCapacity) {
+                val newcapacity = freeCapacity - value.first
+                val newvulnerability = vulnerability + value.second
+                val newTreasures = leftTreasures.minus(key)
+                val newList = list.plus(key)
                 findList(newcapacity, newvulnerability, newTreasures, newList)
             }
         }
         if (vulnerability > maximum.second) maximum = Pair(list.toSet(), vulnerability)
     }
-    try {
-        findList(capacity, 0, treasures, mutableListOf<String>())
-    } catch (e: Exception) {
-        return maximum.first
-    }
+
+    findList(capacity, 0, treasures, mutableListOf<String>())
     return maximum.first
 }
