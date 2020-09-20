@@ -191,7 +191,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
     for ((key, value1) in mapB) {
         if (!result.containsKey(key))
             result.put(key, value1)
-        else if (!result[key]!!.contains(value1) && value1.isNotEmpty()) result[key] += ", $value1"
+        else if (!result[key]!!.contains(value1)) result[key] += ", $value1"
     }
     return result
 }
@@ -253,9 +253,10 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    if (word.isEmpty() && chars.isNotEmpty()) return false
-    word.toLowerCase().forEach {
-        if (!chars.toString().toLowerCase().contains(it)) return false
+    word.forEach { symbol ->
+        val newChars = mutableListOf<Char>()
+        chars.forEach { newChars.add(it.toLowerCase()) }
+        if (!newChars.contains(symbol.toLowerCase())) return false
     }
     return true
 }
