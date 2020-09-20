@@ -346,8 +346,8 @@ class Tests {
         /*assertEquals(
             emptySet<String>(),
             bagPacking(
-                TreasureTester(100, 3000),
-                3000
+                TreasureTester(, 100000),
+                100000
             )
         )*/
         assertEquals(
