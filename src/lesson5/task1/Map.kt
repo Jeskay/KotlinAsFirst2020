@@ -4,10 +4,13 @@ package lesson5.task1
 
 import java.lang.Integer.min
 import java.lang.Math.max
+import java.lang.Math.random
 import java.sql.Time
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
 import kotlin.concurrent.schedule
+import kotlin.random.Random
 
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
@@ -231,14 +234,14 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    var min = Pair("", Double.MAX_VALUE)
+    var min: Pair<String?, Double> = Pair(null, Double.MAX_VALUE)
     for ((key, value) in stuff) {
         if (value.first != kind)
             continue
         if (min.second > value.second)
             min = Pair(key, value.second)
     }
-    return if (min.first == "") null else min.first
+    return min.first
 }
 
 /**
@@ -369,6 +372,20 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     return Pair(-1, -1)
 }
 
+fun TreasureTester(elements: Int, capacity: Int): Map<String, Pair<Int, Int>> {
+    val result = mutableMapOf<String, Pair<Int, Int>>()
+    for (number in 0..elements) {
+        result.put(
+            number.toString(),
+            Pair(
+                (0..capacity).random(),
+                (0..capacity).random()
+            )
+        )
+    }
+    return result
+}
+
 /**
  * Очень сложная (8 баллов)
  *
@@ -393,6 +410,36 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     var maximum = Pair(emptySet<String>(), -1)
     val timeRemain = LocalTime.now()
+    val treasuresList = listOf<String>("").plus(treasures.keys.toList())
+    fun find(): Set<String> {
+        val arr: Array<Array<Int>> = Array(treasures.size + 1) { Array(capacity + 1) { 0 } }
+        //setting up some shit
+        for (index in 1..treasures.size) {
+            val current = treasuresList[index]
+            for (s in 1..capacity) {
+                val currentTreasure = treasures[current]!!
+                if (s >= currentTreasure.first)
+                    arr[index][s] =
+                        max(arr[index - 1][s], arr[index - 1][s - currentTreasure.first] + currentTreasure.second)
+                else
+                    arr[index][s] = arr[index - 1][s]
+            }
+        }
+        //here goes the magic
+        val result = mutableSetOf<String>()
+        fun getTheList(index: Int, s: Int) {
+            if (arr[index][s] == 0) return
+            if (arr[index - 1][s] == arr[index][s]) getTheList(index - 1, s)
+            else {
+                val current = treasuresList[index]
+                getTheList(index - 1, s - treasures[current]!!.first)
+                result.add(current)
+            }
+        }
+        getTheList(arr.size - 1, capacity)
+        return result
+    }
+
     fun findList(
         freeCapacity: Int,
         vulnerability: Int,
@@ -400,7 +447,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         list: List<String>
     ) {
         for ((key, value) in leftTreasures) {
-            if (timeRemain.second - LocalTime.now().second > 9) break
+            if (LocalTime.now().toSecondOfDay() - timeRemain.toSecondOfDay() > 10) return
             if (value.first <= freeCapacity) {
                 val newcapacity = freeCapacity - value.first
                 val newvulnerability = vulnerability + value.second
@@ -411,7 +458,10 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
         if (vulnerability > maximum.second) maximum = Pair(list.toSet(), vulnerability)
     }
-
-    findList(capacity, 0, treasures, mutableListOf<String>())
-    return maximum.first
+    return if (treasures.size >= 50)
+        find()
+    else {
+        findList(capacity, 0, treasures, mutableListOf<String>())
+        maximum.first
+    }
 }
