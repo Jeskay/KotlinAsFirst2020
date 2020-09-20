@@ -458,7 +458,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
         if (vulnerability > maximum.second) maximum = Pair(list.toSet(), vulnerability)
     }
-    return if (treasures.size >= 50)
+    return if (treasures.size >= 20)
         find()
     else {
         findList(capacity, 0, treasures, mutableListOf<String>())
