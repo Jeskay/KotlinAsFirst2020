@@ -74,7 +74,59 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    val input = str.split(" ")
+    var result = ""
+    fun checkMonth(number: Int, month: Int): Boolean = when {
+        month == 1 && number in 1..31 -> true
+        month == 2 && number in 1..29 -> true
+        month == 3 && number in 1..31 -> true
+        month == 4 && number in 1..30 -> true
+        month == 5 && number in 1..31 -> true
+        month == 6 && number in 1..30 -> true
+        month == 7 && number in 1..31 -> true
+        month == 8 && number in 1..31 -> true
+        month == 9 && number in 1..30 -> true
+        month == 10 && number in 1..31 -> true
+        month == 11 && number in 1..30 -> true
+        month == 12 && number in 1..31 -> true
+        else -> false
+    }
+
+    fun getMonth(month: String): Int? = when (month) {
+        "янвая" -> 1
+        "февраля" -> 2
+        "марта" -> 3
+        "апреля" -> 4
+        "мая" -> 5
+        "июня" -> 6
+        "июля" -> 7
+        "августа" -> 8
+        "сентября" -> 9
+        "октября" -> 10
+        "ноября" -> 11
+        "декабря" -> 12
+        else -> null
+    }
+    try {
+        if (input.size != 3) throw Exception()
+        val month = getMonth(input[1])
+        if (month == 2) {
+            val year = input[2].toInt()
+            if ((year % 400 == 0) || (year % 100 != 0 && year % 4 == 0)) {
+                if (input[0].toInt() !in 1..29) throw Exception()
+            } else if (input[0].toInt() !in 1..28) throw Exception()
+
+        }
+        if (month == null) throw Exception()
+        if (checkMonth(input[0].toInt(), month))
+            result = String.format("%02d.%02d.%02d", input[0].toInt(), month, input[2].toInt())
+    } catch (e: Exception) {
+
+    } finally {
+        return result
+    }
+}
 
 /**
  * Средняя (4 балла)

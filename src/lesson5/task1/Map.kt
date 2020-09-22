@@ -191,7 +191,7 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
     for ((key, value1) in mapB) {
         if (!result.containsKey(key))
             result.put(key, value1)
-        else if (!result[key]!!.contains(value1)) result[key] += ", $value1"
+        else if (!result[key]!!.contains(value1) && value1.isNotEmpty()) result[key] += ", $value1"
     }
     return result
 }
@@ -233,14 +233,14 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    var min: Pair<String?, Double> = Pair(null, Double.MAX_VALUE)
+    var min: Pair<String, Double>? = null
     for ((key, value) in stuff) {
         if (value.first != kind)
             continue
-        if (min.second > value.second)
+        if (min == null || min.second > value.second)
             min = Pair(key, value.second)
     }
-    return min.first
+    return min?.first
 }
 
 /**
@@ -253,6 +253,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
+    if (word.isEmpty()) return true
     word.forEach { symbol ->
         val newChars = mutableListOf<Char>()
         chars.forEach { newChars.add(it.toLowerCase()) }
@@ -343,6 +344,23 @@ fun hasAnagrams(words: List<String>): Boolean {
  *        )
  */
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> = TODO()
+//    val result = mutableMapOf<String, Set<String>>()
+//
+//    fun findFriends(previous: Set<String>, name: String): Set<String> {
+//        if (result.containsKey(name)) return result[name]!!
+//        if (!friends.containsKey(name)) return emptySet()
+//        if (previous.contains(name)) {
+//            val mutual = mutableSetOf<String>()
+//            previous.forEach {
+//                mutual.addAll(findFriends())
+//            }
+//        }
+//        val res = mutableSetOf<String>()
+//        friends[name]!!.forEach { human ->
+//            res.addAll(findFriends(previous.plus(human), human).filter { !res.contains(it) })
+//        }
+//        return res
+//    }
 
 /**
  * Сложная (6 баллов)
