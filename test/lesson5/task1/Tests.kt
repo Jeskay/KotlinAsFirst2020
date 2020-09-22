@@ -188,6 +188,13 @@ class Tests {
                 mapOf("Emergency" to "911", "Police" to "02")
             )
         )
+        assertEquals(
+            mapOf("" to "72p[Bp~NALcuoJOZ9v)^,?{4e5!fXDkcZqy?fS.o,3+\\\\){vUMU-u!Rjw2&0{V?M{\\\"]?66|^P>+,+YK|kc&p(r|b>CM\\tQONWLuD}!qOYyKh*%'L<Y\\\\Qq1-[^fxi3?V_]hp>o+_zq3MZ{v-gHj?pg)I?~-.\\nU^r\\\\MI`~jgQ`82\$2|]hbBrH 4vSE}t=2|aT].ivXm#m, j"),
+            mergePhoneBooks(
+                mapOf("" to "72p[Bp~NALcuoJOZ9v)^,?{4e5!fXDkcZqy?fS.o,3+\\\\){vUMU-u!Rjw2&0{V?M{\\\"]?66|^P>+,+YK|kc&p(r|b>CM\\tQONWLuD}!qOYyKh*%'L<Y\\\\Qq1-[^fxi3?V_]hp>o+_zq3MZ{v-gHj?pg)I?~-.\\nU^r\\\\MI`~jgQ`82\$2|]hbBrH 4vSE}t=2|aT].ivXm#m"),
+                mapOf("" to "j")
+            )
+        )
     }
 
     @Test
