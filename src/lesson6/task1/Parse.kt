@@ -94,7 +94,7 @@ fun dateStrToDigit(str: String): String {
     }
 
     fun getMonth(month: String): Int? = when (month) {
-        "янвая" -> 1
+        "января" -> 1
         "февраля" -> 2
         "марта" -> 3
         "апреля" -> 4
@@ -120,7 +120,7 @@ fun dateStrToDigit(str: String): String {
         }
         if (month == null) throw Exception()
         if (checkMonth(input[0].toInt(), month))
-            result = String.format("%02d.%02d.%02d", input[0].toInt(), month, input[2].toInt())
+            result = String.format("%02d.%02d.%d", input[0].toInt(), month, input[2].toInt())
     } catch (e: Exception) {
 
     } finally {
