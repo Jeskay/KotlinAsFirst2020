@@ -105,6 +105,7 @@ fun fib(n: Int): Int {
  */
 fun minDivisor(n: Int): Int {
     tailrec fun noLoops(number: Int): Int {
+        if (number == n / 2) return n
         if (n % number == 0) return number
         return noLoops(number + 1)
     }
@@ -117,11 +118,12 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    tailrec fun noLoops(number: Int): Int{
-        if (n % number == 0) return number
-        return noLoops(number - 1)
+    tailrec fun noLoops(number: Int): Int {
+        if (number == n / 2) return 1
+        if (n % number == 0) return n / number
+        return noLoops(number + 1)
     }
-    return noLoops(n - 1)
+    return noLoops(2)
 }
 
 /**

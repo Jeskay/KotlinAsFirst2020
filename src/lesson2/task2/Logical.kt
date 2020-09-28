@@ -3,6 +3,8 @@
 package lesson2.task2
 
 import lesson1.task1.sqr
+import java.lang.Integer.max
+import java.lang.Integer.min
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -39,10 +41,7 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean = (x1 == x2) || 
  * Вернуть число дней в этом месяце этого года по григорианскому календарю.
  */
 fun daysInMonth(month: Int, year: Int): Int = when(month) {
-    4 -> 30
-    6 -> 30
-    9 -> 30
-    11 -> 30
+    4, 6, 9, 11 -> 30
     2 -> if (year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)) 29 else 28
     else -> 31
 }
@@ -71,13 +70,16 @@ fun circleInside(
  * кирпич 4 х 4 х 4 пройдёт через отверстие 4 х 4.
  * Вернуть true, если кирпич пройдёт
  */
-fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean =
-    when {
-        a <= r && b <= s -> true
-        a <= s && b <= r -> true
-        a <= r && c <= s -> true
-        a <= s && c <= r -> true
-        b <= s && c <= r -> true
-        b <= r && c <= s -> true
-        else -> false
-    }
+fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
+    val arr = arrayOf(a, b, c).sortedArray()
+    return (arr[0] <= min(r, s) && arr[1] <= max(r, s))
+}//короче уже некуда
+//    when {
+//        a <= r && b <= s -> true
+//        a <= s && b <= r -> true
+//        a <= r && c <= s -> true
+//        a <= s && c <= r -> true
+//        b <= s && c <= r -> true
+//        b <= r && c <= s -> true
+//        else -> false
+//    }
