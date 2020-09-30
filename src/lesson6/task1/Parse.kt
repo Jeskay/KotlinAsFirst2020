@@ -374,6 +374,7 @@ fun fromRoman(roman: String): Int {
         }
     }
     return try {
+        if (roman.isEmpty()) throw BullShitException("user", "Empty input")
         getNumber(roman, -1, -2)
     } catch (e: Exception) {
         -1
