@@ -2,6 +2,7 @@
 
 package lesson6.task1
 
+import lesson1.task1.seconds
 import kotlin.math.max
 
 // Урок 6: разбор строк, исключения
@@ -335,7 +336,49 @@ fun mostExpensive(description: String): String {
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    fun parseRoman(symbols: String): Int {
+        return when {
+            symbols.all { it == 'I' } -> 1 * symbols.length
+            symbols.length == 1 && symbols == "V" -> 5
+            symbols.all { it == 'X' } -> 10 * symbols.length
+            symbols.length == 1 && symbols == "L" -> 50
+            symbols.all { it == 'C' } -> 100 * symbols.length
+            symbols.length == 1 && symbols == "D" -> 500
+            symbols.all { it == 'M' } -> 1000 * symbols.length
+            else -> throw BullShitException("User", "Invalid input format")
+        }
+    }
+
+    fun divideSequence(number: String): Pair<String, String> {
+        var first = ""
+        var second = ""
+        var nextSequence = false
+        number.reversed().forEach {
+            if (it != number.last()) nextSequence = true
+            if (nextSequence) second = it + second
+            else first = it + first
+        }
+        return Pair(first, second)
+    }
+
+    fun getNumber(number: String, previous: Int, preprevious: Int): Int {
+        if (number.isEmpty()) return 0
+        val sequences = divideSequence(number)
+        val last = parseRoman(sequences.first)
+        return if (previous > last) {
+            if (last <= preprevious) throw BullShitException("user", "Weird input")
+            getNumber(sequences.second, last, previous) - last
+        } else {
+            getNumber(sequences.second, last, previous) + last
+        }
+    }
+    return try {
+        getNumber(roman, -1, -2)
+    } catch (e: Exception) {
+        -1
+    }
+}
 
 /**
  * Очень сложная (7 баллов)
