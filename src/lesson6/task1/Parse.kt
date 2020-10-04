@@ -463,7 +463,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
                 }
             }
         }
-        if (position >= cells) throw IllegalStateException()
+        if (position >= cells || position < 0) throw IllegalStateException()
         current++
         commandCounter++
         if (current >= commands.length) break

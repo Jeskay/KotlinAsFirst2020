@@ -74,7 +74,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int = if (n == 0) 1 else log(n.toDouble(), 10.0).toInt() + 1
+fun digitNumber(n: Int): Int = if (n == 0) 1 else log(abs(n.toDouble()), 10.0).toInt() + 1
 // А в чем тогда смысл этого упражнения если рекурсии и циклы не нужны?
 /**
  * Простая (2 балла)
@@ -260,7 +260,7 @@ fun hasDifferentDigits(n: Int): Boolean {
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
 fun sin(x: Double, eps: Double): Double {
-    fun checkBullshit(number: Double): Double = abs(number % (2 * PI))
+    fun checkBullshit(number: Double): Double = number % (2 * PI)
 
     val newX = checkBullshit(x)
     tailrec fun noLoops(prev: Double, counter: Int, sum: Double): Double {
@@ -282,7 +282,7 @@ fun sin(x: Double, eps: Double): Double {
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
 fun cos(x: Double, eps: Double): Double {
-    fun checkBullshit(number: Double): Double = abs(number % (2 * PI))
+    fun checkBullshit(number: Double): Double = number % (2 * PI)
 
     val newX = checkBullshit(x)
     fun noLoops(prev: Double, counter: Int, sum: Double): Double {
@@ -302,7 +302,7 @@ fun cos(x: Double, eps: Double): Double {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun superDuperIDKHowToNameItFunction(
+tailrec fun superDuperIDKHowToNameItFunction(
     CurrentCreator: (arg: Pair<Int, Int>) -> Int,
     NewInstanceCreator: (arg: Pair<Int, Int>) -> Pair<Int, Int>,
     input: Pair<Int, Int>,
