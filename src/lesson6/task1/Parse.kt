@@ -428,6 +428,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     }
 
     fun getIndexOfCycle(str: String, current: Int, seekFor: Char, opposite: Char): Int {
+        if (str[current] == seekFor) return current
         var counter = current
         var oppositeCount = 1
         while (oppositeCount > 0) {
@@ -452,9 +453,9 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             '+' -> result[position]++
             '-' -> result[position]--
             '[' -> {
-                if (result[position] == 0){
+                if (result[position] == 0) {
                     current = getIndexOfCycle(commands, current + 1, ']', '[')
-                }
+                } else if (commands[current + 1] == ']') return result.toList()
             }
             ']' -> {
                 if (result[position] != 0) {
