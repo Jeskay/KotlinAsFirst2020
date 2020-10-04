@@ -436,6 +436,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             if (symbol == opposite) oppositeCount++
             else if (symbol == seekFor) oppositeCount--
             counter += if (seekFor == ']') 1 else -1
+            if (counter >= str.length || counter < 0) throw IllegalArgumentException()
         }
         return counter
     }

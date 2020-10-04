@@ -151,6 +151,13 @@ class Tests {
         assertEquals(listOf(4), computeDeviceCells(1, "[]++++[]", 500))
         assertThrows(IllegalArgumentException::class.java) { computeDeviceCells(10, "===", 3) }
         assertThrows(IllegalArgumentException::class.java) { computeDeviceCells(10, "+>+>[+>", 3) }
+        assertThrows(IllegalArgumentException::class.java) {
+            computeDeviceCells(
+                1,
+                "+++++++++++++]++]++-->++-+ -]<-< -[+<]<----++ + -> <>< -+<<- +]++<+---[<><+<<----[---<<<[-<-[---+ -+",
+                1083
+            )
+        }
         assertThrows(IllegalStateException::class.java) { computeDeviceCells(20, ">>>>>>>>>>>>>", 12) }
         assertThrows(IllegalStateException::class.java) { computeDeviceCells(1, "<", 100) }
     }
