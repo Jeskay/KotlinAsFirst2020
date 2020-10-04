@@ -73,13 +73,4 @@ fun circleInside(
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
     val arr = arrayOf(a, b, c).sortedArray()
     return (arr[0] <= min(r, s) && arr[1] <= max(r, s))
-}//короче уже некуда
-//    when {
-//        a <= r && b <= s -> true
-//        a <= s && b <= r -> true
-//        a <= r && c <= s -> true
-//        a <= s && c <= r -> true
-//        b <= s && c <= r -> true
-//        b <= r && c <= s -> true
-//        else -> false
-//    }
+}

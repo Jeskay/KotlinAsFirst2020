@@ -2,6 +2,7 @@
 
 package lesson3.task1
 
+import lesson9.task2.findHoles
 import java.time.temporal.TemporalAmount
 import kotlin.math.*
 
@@ -73,14 +74,8 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int {
-    fun noLoops(count: Int, current: Int): Int {
-        return if (current / 10 != 0) noLoops(count + 1, current / 10)
-        else count
-    }
-    return noLoops(1, n)
-}
-
+fun digitNumber(n: Int): Int = if (n == 0) 1 else log(n.toDouble(), 10.0).toInt() + 1
+// А в чем тогда смысл этого упражнения если рекурсии и циклы не нужны?
 /**
  * Простая (2 балла)
  *
@@ -105,7 +100,7 @@ fun fib(n: Int): Int {
  */
 fun minDivisor(n: Int): Int {
     tailrec fun noLoops(number: Int): Int {
-        if (number == n / 2) return n
+        if (number > sqrt(n.toDouble())) return n
         if (n % number == 0) return number
         return noLoops(number + 1)
     }
@@ -119,7 +114,7 @@ fun minDivisor(n: Int): Int {
  */
 fun maxDivisor(n: Int): Int {
     tailrec fun noLoops(number: Int): Int {
-        if (number == n / 2) return 1
+        if (number > sqrt(n.toDouble())) return 1
         if (n % number == 0) return n / number
         return noLoops(number + 1)
     }
@@ -143,7 +138,7 @@ fun maxDivisor(n: Int): Int {
  * этого для какого-либо начального X > 0.
  */
 fun collatzSteps(x: Int): Int {
-    tailrec fun noLoops(counter: Int, number: Int): Int{
+    tailrec fun noLoops(counter: Int, number: Int): Int {
         if (number == 1) return counter
         return noLoops(counter + 1, if (number % 2 == 0) number / 2 else number * 3 + 1)
     }
@@ -265,11 +260,7 @@ fun hasDifferentDigits(n: Int): Boolean {
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
 fun sin(x: Double, eps: Double): Double {
-    fun checkBullshit(number: Double): Double {
-        if (abs(number) <= 2 * PI) return number
-        return if (number >= 0) checkBullshit(number - 2 * PI)
-        else checkBullshit(number + 2 * PI)
-    }
+    fun checkBullshit(number: Double): Double = abs(number % (2 * PI))
 
     val newX = checkBullshit(x)
     tailrec fun noLoops(prev: Double, counter: Int, sum: Double): Double {
@@ -291,11 +282,7 @@ fun sin(x: Double, eps: Double): Double {
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
 fun cos(x: Double, eps: Double): Double {
-    fun checkBullshit(number: Double): Double {
-        if (abs(number) <= 2 * PI) return number
-        return if (number >= 0) checkBullshit(number - 2 * PI)
-        else checkBullshit(number + 2 * PI)
-    }
+    fun checkBullshit(number: Double): Double = abs(number % (2 * PI))
 
     val newX = checkBullshit(x)
     fun noLoops(prev: Double, counter: Int, sum: Double): Double {
@@ -315,27 +302,53 @@ fun cos(x: Double, eps: Double): Double {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int {
-    fun find(number: Int, toFind: Int, coef: Int, count: Int): Int{
+fun superDuperIDKHowToNameItFunction(
+    CurrentCreator: (arg: Pair<Int, Int>) -> Int,
+    NewInstanceCreator: (arg: Pair<Int, Int>) -> Pair<Int, Int>,
+    input: Pair<Int, Int>,
+    amount: Int,
+    coefficient: Int,
+    counter: Int,
+    number: Int
+): Int {
+    val current = CurrentCreator(input)
+    var newCoefficient = coefficient
+    var newAmount = amount
+
+    fun find(number: Int, toFind: Int, coef: Int, count: Int): Int {
         if (count == toFind) return number / coef
         return find(number % coef, toFind, coef / 10, count + 1)
     }
 
-    tailrec fun noLoops(number: Int, amount: Int, coef: Int, counter: Int): Int {
-        val square = number * number
-        var newcoef = coef
-        var newamount = amount
-        if (square / coef >= 10) {
-            newcoef *= 10
-            newamount++
-        }
-        if (n in counter..(counter + newamount)) {
-            return find(square, n - counter, newcoef, 1)
-        }
-        return noLoops(number + 1, newamount, newcoef, counter + newamount)
+    if (current / coefficient >= 10) {
+        newCoefficient *= 10
+        newAmount++
     }
-    return noLoops(1, 1, 1, 0)
+    if (number in counter..(counter + newAmount)) {
+        return find(current, number - counter, newCoefficient, 1)
+    }
+    return superDuperIDKHowToNameItFunction(
+        CurrentCreator,
+        NewInstanceCreator,
+        NewInstanceCreator(Pair(input.second, current)),
+        newAmount,
+        newCoefficient,
+        counter + newAmount,
+        number
+    )
 }
+//написать класс было бы проще но этот урок посвящен функциональному программированию
+
+fun squareSequenceDigit(n: Int): Int =
+    superDuperIDKHowToNameItFunction(
+        { (first, second) -> first * second },
+        { (first, _) -> Pair(first + 1, first + 1) },
+        Pair(1, 1),
+        1,
+        1,
+        0,
+        n
+    )
 
 /**
  * Сложная (5 баллов)
@@ -346,27 +359,16 @@ fun squareSequenceDigit(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun fibSequenceDigit(n: Int): Int {
-    fun find(number: Int, toFind: Int, coef: Int, count: Int): Int{
-        if (count == toFind) return number / coef
-        return find(number % coef, toFind, coef / 10, count + 1)
-    }
-
-    tailrec fun noLoops(prev1: Int, prev2: Int, amount: Int, coef: Int, counter: Int): Int {
-        val current = prev1 + prev2
-        var newcoef = coef
-        var newamount = amount
-        if (current / coef >= 10) {
-            newcoef *= 10
-            newamount++
-        }
-        if (n in counter..(counter + newamount)) {
-            return find(current, n - counter, newcoef, 1)
-        }
-        return noLoops(prev2, current, newamount, newcoef, counter + newamount)
-    }
-    return when (n) {
-        in 1..2 -> 1
-        else -> noLoops(1, 1, 1, 1, 2)
-    }
+fun fibSequenceDigit(n: Int): Int = when (n) {
+    in 1..2 -> 1
+    else ->
+        superDuperIDKHowToNameItFunction(
+            { (first, second) -> first + second },
+            { (first, second) -> Pair(first, second) },
+            Pair(1, 1),
+            1,
+            1,
+            2,
+            n
+        )
 }

@@ -2,7 +2,7 @@
 
 package lesson6.task1
 
-import lesson1.task1.seconds
+import java.lang.IllegalArgumentException
 import kotlin.math.max
 
 // Урок 6: разбор строк, исключения
@@ -417,4 +417,56 @@ fun fromRoman(roman: String): Int {
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    fun checkCommands(command: String): Boolean {
+        val correctSymbols = listOf<Char>('+', '-', '>', '<', ' ', '[', ']')
+        val incorrect = command.filter { !correctSymbols.contains(it) }
+        if (incorrect.isNotEmpty()) return false
+        val str1 = command.replace("[^]]".toRegex(), "")
+        val str2 = command.replace("[^\\[]".toRegex(), "")
+        return str1.length == str2.length
+    }
+
+    fun getIndexOfCycle(str: String, current: Int, seekFor: Char, opposite: Char): Int {
+        var counter = current
+        var oppositeCount = 1
+        while (oppositeCount > 0) {
+            val symbol = str[counter]
+            if (symbol == opposite) oppositeCount++
+            else if (symbol == seekFor) oppositeCount--
+            counter += if (seekFor == ']') 1 else -1
+        }
+        return counter
+    }
+
+    val result = Array(cells) { 0 }
+    var position = cells / 2
+    if (!checkCommands(commands)) throw IllegalArgumentException()
+    var current = 0
+    var commandCounter = 0
+    while (commandCounter < limit) {
+        if (current >= commands.length) break
+        when (commands[current]) {
+            '>' -> position++
+            '<' -> position--
+            '+' -> result[position]++
+            '-' -> result[position]--
+            '[' -> {
+                if (result[position] == 0){
+                    current = getIndexOfCycle(commands, current + 1, ']', '[')
+                }
+            }
+            ']' -> {
+                if (result[position] != 0) {
+                    current = getIndexOfCycle(commands, current - 1, '[', ']')
+                    commandCounter--
+                }
+            }
+        }
+        if (position >= cells) throw IllegalStateException()
+        current++
+        commandCounter++
+        if (current >= commands.length) break
+    }
+    return result.toList()
+}
