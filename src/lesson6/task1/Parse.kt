@@ -418,7 +418,7 @@ fun fromRoman(roman: String): Int {
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    fun checkCommands(command: String): Boolean {
+    fun checkCommands(command: String): Boolean {//возможно это не нужно, но пусть будет. Иногда работает быстрее
         val correctSymbols = listOf<Char>('+', '-', '>', '<', ' ', '[', ']')
         val incorrect = command.filter { !correctSymbols.contains(it) }
         if (incorrect.isNotEmpty()) return false
@@ -428,7 +428,6 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     }
 
     fun getIndexOfCycle(str: String, current: Int, seekFor: Char, opposite: Char): Int {
-        //if (str[current] == seekFor) return current
         var counter = current
         var oppositeCount = 1
         while (oppositeCount > 0) {
@@ -461,7 +460,6 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             ']' -> {
                 if (result[position] != 0) {
                     current = getIndexOfCycle(commands, current, '[', ']')
-                    //commandCounter--
                 }
             }
         }

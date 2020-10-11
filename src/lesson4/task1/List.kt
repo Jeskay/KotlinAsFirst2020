@@ -459,15 +459,15 @@ fun russian(n: Int): String {
                 return res
             }
             else -> {
-                var firstdigit = "" + getNumber(number / 1000)
-                if (firstdigit[firstdigit.length - 1] == 'а' && firstdigit[firstdigit.length - 2] == 'в') {
-                    firstdigit = firstdigit.substring(0..firstdigit.length - 2) + 'е'
+                var firstDigit = "" + getNumber(number / 1000)
+                if (firstDigit[firstDigit.length - 1] == 'а' && firstDigit[firstDigit.length - 2] == 'в') {
+                    firstDigit = firstDigit.substring(0..firstDigit.length - 2) + 'е'
                 }
-                if (firstdigit[firstdigit.length - 1] == 'н' && firstdigit[firstdigit.length - 2] == 'и') {
-                    firstdigit = firstdigit.substring(0..firstdigit.length - 3) + "на"
+                if (firstDigit[firstDigit.length - 1] == 'н' && firstDigit[firstDigit.length - 2] == 'и') {
+                    firstDigit = firstDigit.substring(0..firstDigit.length - 3) + "на"
                 }
                 val secondPart = getNumber(number % 1000)
-                return "$firstdigit ${getThousand(number / 1000)}${if (secondPart.isNotEmpty()) " $secondPart" else ""}"
+                return "$firstDigit ${getThousand(number / 1000)}${if (secondPart.isNotEmpty()) " $secondPart" else ""}"
             }
         }
     }

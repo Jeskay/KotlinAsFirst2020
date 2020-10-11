@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import java.util.*
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -63,7 +64,13 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Подчёркивание в середине и/или в конце строк значения не имеет.
  */
 fun deleteMarked(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    for (line in File(inputName).readLines()) {
+        if (line.isNotEmpty() && line.first() == '_') continue
+        if (line.isNotEmpty()) writer.write(line)
+        writer.newLine()
+    }
+    writer.close()
 }
 
 /**
@@ -75,7 +82,21 @@ fun deleteMarked(inputName: String, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    val newMap = mutableMapOf<String, Int>()
+    val text = File(inputName).readText().toLowerCase()
+    for (item in substrings) {
+        val x = item.toLowerCase()
+        var counter = 0
+        var count = 0
+        while (counter <= (text.length - item.length)) {
+            if (text.substring(counter, counter + item.length) == x) count++
+            counter++
+        }
+        newMap[item] = count
+    }
+    return newMap
+}
 
 
 /**
@@ -268,15 +289,15 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  *
  * Соответствующий выходной файл:
 <html>
-    <body>
-        <p>
-            Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
-            Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
-        </p>
-        <p>
-            Suspendisse <s>et elit in enim tempus iaculis</s>.
-        </p>
-    </body>
+<body>
+<p>
+Lorem ipsum <i>dolor sit amet</i>, consectetur <b>adipiscing</b> elit.
+Vestibulum lobortis. <s>Est vehicula rutrum <i>suscipit</i></s>, ipsum <s>lib</s>ero <i>placerat <b>tortor</b></i>.
+</p>
+<p>
+Suspendisse <s>et elit in enim tempus iaculis</s>.
+</p>
+</body>
 </html>
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
@@ -383,7 +404,58 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlLists(inputName: String, outputName: String) {
-    TODO()
+    val closet = Stack<String>()
+    var tabs = "    "
+    val writer = File(outputName).bufferedWriter()
+    var prevTab: String? = null
+    fun addLine(line: String, step: Boolean?, sign: Char) {
+        writer.newLine()
+        if (step != null && step) {
+            writer.write("<ul>")
+            writer.newLine()
+            tabs += "  "
+            closet.add("</ul>")
+        } else if (step != null) {
+            writer.write(tabs + closet.first())
+            writer.newLine()
+            tabs.removeRange(tabs.length - 2, tabs.length - 1)
+            closet.removeFirst()
+        }
+        writer.write(tabs + "<li>${line.substringAfter(sign)}")
+        closet.add("</li>")
+    }
+
+    fun writeBody() {
+        writer.write("<html>")
+        writer.newLine()
+        writer.write("  <body>")
+        writer.newLine()
+        writer.write("    <p>")
+        writer.newLine()
+        closet.addAll(arrayOf("</html>", "</body>", "</p>"))
+    }
+
+    fun getTabs(str: String): String {
+        var result = ""
+        for (symbol in str) {
+            if (symbol != ' ') break
+            result += ' '
+        }
+        return result
+    }
+    writeBody()
+    for (line in File(inputName).readLines()) {
+        val prefix = if (line.trim().first() == '*') '*' else '.'
+        val currentTab = getTabs(line)
+        var step: Boolean? = null
+        if (prevTab == null || prevTab.length < currentTab.length)
+            step = true
+        else if (prevTab.length > currentTab.length)
+            step = false
+        addLine(line, step, prefix)
+        prevTab = currentTab
+    }
+    writer.close()
 }
 
 /**
@@ -404,23 +476,23 @@ fun markdownToHtml(inputName: String, outputName: String) {
  * Вывести в выходной файл процесс умножения столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 111):
-   19935
-*    111
+19935
+ *    111
 --------
-   19935
+19935
 + 19935
 +19935
 --------
- 2212785
+2212785
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  * Нули в множителе обрабатывать так же, как и остальные цифры:
-  235
-*  10
+235
+ *  10
 -----
-    0
+0
 +235
 -----
- 2350
+2350
  *
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
@@ -434,16 +506,16 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Вывести в выходной файл процесс деления столбиком числа lhv (> 0) на число rhv (> 0).
  *
  * Пример (для lhv == 19935, rhv == 22):
-  19935 | 22
- -198     906
- ----
-    13
-    -0
-    --
-    135
-   -132
-   ----
-      3
+19935 | 22
+-198     906
+----
+13
+-0
+--
+135
+-132
+----
+3
 
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *

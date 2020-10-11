@@ -2,8 +2,6 @@
 
 package lesson3.task1
 
-import lesson9.task2.findHoles
-import java.time.temporal.TemporalAmount
 import kotlin.math.*
 
 // Урок 3: циклы
@@ -222,12 +220,12 @@ fun revert(n: Int): Int {
  */
 fun isPalindrome(n: Int): Boolean {
     var coef = 1
-    var halfnumber = 0
+    var halfNumber = 0
     fun noLoops(current: Int): Boolean {
-        if (current / coef < 1) return halfnumber == current
-        if (current / coef < 10) return halfnumber == (current / 10)
+        if (current / coef < 1) return halfNumber == current
+        if (current / coef < 10) return halfNumber == (current / 10)
         coef *= 10
-        halfnumber = halfnumber * 10 + (current % 10)
+        halfNumber = halfNumber * 10 + (current % 10)
         return noLoops(current / 10)
     }
     return noLoops(n)
@@ -260,9 +258,7 @@ fun hasDifferentDigits(n: Int): Boolean {
  * Использовать kotlin.math.sin и другие стандартные реализации функции синуса в этой задаче запрещается.
  */
 fun sin(x: Double, eps: Double): Double {
-    fun checkBullshit(number: Double): Double = number % (2 * PI)
-
-    val newX = checkBullshit(x)
+    val newX = x % (2 * PI)
     tailrec fun noLoops(prev: Double, counter: Int, sum: Double): Double {
         val current = (-1) * prev * newX * newX / (2 * counter * (2 * counter + 1))
         if (abs(current) < eps) return sum + current
@@ -282,9 +278,7 @@ fun sin(x: Double, eps: Double): Double {
  * Использовать kotlin.math.cos и другие стандартные реализации функции косинуса в этой задаче запрещается.
  */
 fun cos(x: Double, eps: Double): Double {
-    fun checkBullshit(number: Double): Double = number % (2 * PI)
-
-    val newX = checkBullshit(x)
+    val newX = x % (2 * PI)
     fun noLoops(prev: Double, counter: Int, sum: Double): Double {
         val current = (-1) * prev * newX * newX / (2 * counter * (2 * counter - 1))
         if (abs(current) < eps) return sum + current
@@ -302,16 +296,16 @@ fun cos(x: Double, eps: Double): Double {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-tailrec fun superDuperIDKHowToNameItFunction(
-    CurrentCreator: (arg: Pair<Int, Int>) -> Int,
-    NewInstanceCreator: (arg: Pair<Int, Int>) -> Pair<Int, Int>,
+tailrec fun recursiveSearchOfDigitInSequence(
+    currentCreator: (arg: Pair<Int, Int>) -> Int,
+    newInstanceCreator: (arg: Pair<Int, Int>) -> Pair<Int, Int>,
     input: Pair<Int, Int>,
     amount: Int,
     coefficient: Int,
     counter: Int,
     number: Int
 ): Int {
-    val current = CurrentCreator(input)
+    val current = currentCreator(input)
     var newCoefficient = coefficient
     var newAmount = amount
 
@@ -327,10 +321,10 @@ tailrec fun superDuperIDKHowToNameItFunction(
     if (number in counter..(counter + newAmount)) {
         return find(current, number - counter, newCoefficient, 1)
     }
-    return superDuperIDKHowToNameItFunction(
-        CurrentCreator,
-        NewInstanceCreator,
-        NewInstanceCreator(Pair(input.second, current)),
+    return recursiveSearchOfDigitInSequence(
+        currentCreator,
+        newInstanceCreator,
+        newInstanceCreator(Pair(input.second, current)),
         newAmount,
         newCoefficient,
         counter + newAmount,
@@ -340,7 +334,7 @@ tailrec fun superDuperIDKHowToNameItFunction(
 //написать класс было бы проще но этот урок посвящен функциональному программированию
 
 fun squareSequenceDigit(n: Int): Int =
-    superDuperIDKHowToNameItFunction(
+    recursiveSearchOfDigitInSequence(
         { (first, second) -> first * second },
         { (first, _) -> Pair(first + 1, first + 1) },
         Pair(1, 1),
@@ -362,7 +356,7 @@ fun squareSequenceDigit(n: Int): Int =
 fun fibSequenceDigit(n: Int): Int = when (n) {
     in 1..2 -> 1
     else ->
-        superDuperIDKHowToNameItFunction(
+        recursiveSearchOfDigitInSequence(
             { (first, second) -> first + second },
             { (first, second) -> Pair(first, second) },
             Pair(1, 1),
