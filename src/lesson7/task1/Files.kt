@@ -403,37 +403,89 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-fun markdownToHtmlLists(inputName: String, outputName: String) {
-    val closet = Stack<String>()
-    var tabs = "    "
-    val writer = File(outputName).bufferedWriter()
-    var prevTab: String? = null
-    fun addLine(line: String, step: Boolean?, sign: Char) {
+class InputString constructor(input: String) {
+    var prefix: String = ""
+    var content: String = ""
+
+    init {
+        prefix = if (input.trim().first() == '*') "*" else "."
+        content = input.substringAfter(prefix)
+    }
+}
+
+data class Closet(val line: String, val defaultTabs: String)
+
+class HtlmConverter(private var htmlTabs: String, outputFile: String) {
+    private val closets = Stack<Closet>()
+    private val writer = File(outputFile).bufferedWriter()
+
+    fun next(string: InputString, defaultTabs: String, prevDefaultTabs: String) {
+        val tag = if (string.prefix == "*") Pair("<ul>", "</ul>") else Pair("<ol>", "</ol>")
+        //That's for list
+        htmlTabs += "  "
         writer.newLine()
-        if (step != null && step) {
-            writer.write("<ul>")
-            writer.newLine()
-            tabs += "  "
-            closet.add("</ul>")
-        } else if (step != null) {
-            writer.write(tabs + closet.first())
-            writer.newLine()
-            tabs.removeRange(tabs.length - 2, tabs.length - 1)
-            closet.removeFirst()
-        }
-        writer.write(tabs + "<li>${line.substringAfter(sign)}")
-        closet.add("</li>")
+        writer.write(htmlTabs + tag.first)
+        closets.push(Closet(htmlTabs + tag.second, prevDefaultTabs))
+        // That's for item
+        htmlTabs += "  "
+        writer.newLine()
+        writer.write(htmlTabs + "<li>" + string.content)
+        closets.push(Closet("$htmlTabs</li>", defaultTabs))
+        // Closing list
+
     }
 
-    fun writeBody() {
+    fun current(string: InputString, defaultTabs: String) {
+        val close = closets.last()
+        closets.remove(close)
+        writer.write(close.line.substringAfterLast(' '))
+        writer.newLine()
+        //That's next line
+        writer.write(htmlTabs + "<li>" + string.content)
+        closets.push(Closet("$htmlTabs</li>", defaultTabs))
+    }
+
+    fun back(string: InputString, defaultTabs: String) {
+        //Closing all tags until we get the current level
+        for ((line, closetTabs) in closets.reversed()) {
+            if (closetTabs.length < defaultTabs.length || closetTabs == "@") break
+            htmlTabs = htmlTabs.substring(0, htmlTabs.length - 2)
+            val close = closets.last()
+            writer.write(line)
+            writer.newLine()
+            closets.removeLast()
+        }
+        //Writing current item
+        writer.write(htmlTabs + "<li>" + string.content)
+        closets.push(Closet("$htmlTabs</li>", defaultTabs))
+    }
+
+    fun close() {
+        for ((line, closeTabs) in closets.reversed()) {
+            writer.write(line)
+            writer.newLine()
+        }
+        writer.write("    </p>")
+        writer.newLine()
+        writer.write("  </body>")
+        writer.newLine()
+        writer.write("</html>")
+        writer.close()
+    }
+
+    init {
         writer.write("<html>")
         writer.newLine()
-        writer.write("  <body>")
+        writer.write("<body>")
         writer.newLine()
-        writer.write("    <p>")
+        writer.write("<p>")
         writer.newLine()
-        closet.addAll(arrayOf("</html>", "</body>", "</p>"))
     }
+}
+
+fun markdownToHtmlLists(inputName: String, outputName: String) {
+    val converter = HtlmConverter("      ", outputName)
+    var prevTab: String? = null
 
     fun getTabs(str: String): String {
         var result = ""
@@ -443,19 +495,19 @@ fun markdownToHtmlLists(inputName: String, outputName: String) {
         }
         return result
     }
-    writeBody()
+
     for (line in File(inputName).readLines()) {
-        val prefix = if (line.trim().first() == '*') '*' else '.'
         val currentTab = getTabs(line)
-        var step: Boolean? = null
-        if (prevTab == null || prevTab.length < currentTab.length)
-            step = true
-        else if (prevTab.length > currentTab.length)
-            step = false
-        addLine(line, step, prefix)
+        if (prevTab == null || prevTab.length < currentTab.length) {
+            converter.next(InputString(line), currentTab, prevTab ?: "@")
+        } else if (prevTab.length == currentTab.length) {
+            converter.current(InputString(line), currentTab)
+        } else {
+            converter.back(InputString(line), currentTab)
+        }
         prevTab = currentTab
     }
-    writer.close()
+    converter.close()
 }
 
 /**

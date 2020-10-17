@@ -424,7 +424,18 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
         if (incorrect.isNotEmpty()) return false
         val str1 = command.replace("[^]]".toRegex(), "")
         val str2 = command.replace("[^\\[]".toRegex(), "")
-        return str1.length == str2.length
+        if (str1.length != str2.length) return false
+        val str3 = command.filter { it == '[' || it == ']' }
+        var openedCount = 0
+        for (symbol in str3) {
+            if (symbol == ']') {
+                if (openedCount == 0) return false
+                else openedCount--
+            } else
+                openedCount++
+        }
+        if (openedCount != 0) return false
+        return true
     }
 
     fun getIndexOfCycle(str: String, current: Int, seekFor: Char, opposite: Char): Int {
