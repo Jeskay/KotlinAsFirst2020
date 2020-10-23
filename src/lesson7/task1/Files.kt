@@ -633,7 +633,10 @@ class Divider constructor(private val divisor: Int, number: Int) {
         result = (firstToDivide.toInt() / divisor).toString()
         remainder = (firstToDivide.toInt() % divisor).toString()
         val dec = firstToDivide.toInt() - remainder.toInt()
-        if (dec != 0) path.add("-${dec}") else path.add("${getTab(number.toString().length - 1)}-$dec")
+        if (dec == 0) {
+            if (number > 9)path[0] = path[0].substring(1)
+            path.add("${getTab(number.toString().length - 2)}-$dec")
+        } else path.add("-${dec}")
         addLines(max(dec.toString().length + 1, remainder.length), 0)
         this.number = number.toString().substring(firstToDivide.length)
     }
