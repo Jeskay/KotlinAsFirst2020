@@ -4,6 +4,7 @@ package lesson7.task1
 
 import java.io.File
 import java.lang.Integer.max
+import java.lang.Math.min
 import java.util.*
 
 // Урок 7: работа с файлами
@@ -583,9 +584,9 @@ class Divider constructor(private val divisor: Int, number: Int) {
         var tabs = path.last().length - remainder.length + 1
         path.add("${getTab(tabs)}$remainder")
         val dec = remainder.toInt() / divisor * divisor
-        tabs = if (remainder.length == dec.toString().length) tabs - 1 else tabs
-        path.add("${getTab(tabs)}-$dec")
-        addLines(dec.toString().length, tabs)
+        val decTabs = path.last().length - dec.toString().length - 1
+        path.add("${getTab(decTabs)}-$dec")
+        addLines(max(dec.toString().length + 1, remainder.length), decTabs.coerceAtMost(tabs))
         result += remainder.toInt() / divisor
         remainder = (remainder.toInt() - dec).toString()
     }
@@ -601,7 +602,7 @@ class Divider constructor(private val divisor: Int, number: Int) {
 
     private fun addLines(amount: Int, tab: Int) {
         var string = ""
-        for (i in 0..amount)
+        for (i in 1..amount)
             string += "-"
         path.add("${getTab(tab)}$string")
     }
@@ -633,7 +634,7 @@ class Divider constructor(private val divisor: Int, number: Int) {
         remainder = (firstToDivide.toInt() % divisor).toString()
         val dec = firstToDivide.toInt() - remainder.toInt()
         if (dec != 0) path.add("-${dec}") else path.add("${getTab(number.toString().length - 1)}-$dec")
-        addLines(max(dec.toString().length, remainder.length), 0)
+        addLines(max(dec.toString().length + 1, remainder.length), 0)
         this.number = number.toString().substring(firstToDivide.length)
     }
 }
