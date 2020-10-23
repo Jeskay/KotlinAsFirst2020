@@ -340,65 +340,65 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  *
  * Пример входного файла:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
-* Утка по-пекински
-    * Утка
-    * Соус
-* Салат Оливье
-    1. Мясо
-        * Или колбаса
-    2. Майонез
-    3. Картофель
-    4. Что-то там ещё
-* Помидоры
-* Фрукты
-    1. Бананы
-    23. Яблоки
-        1. Красные
-        2. Зелёные
+ * Утка по-пекински
+ * Утка
+ * Соус
+ * Салат Оливье
+1. Мясо
+ * Или колбаса
+2. Майонез
+3. Картофель
+4. Что-то там ещё
+ * Помидоры
+ * Фрукты
+1. Бананы
+23. Яблоки
+1. Красные
+2. Зелёные
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  *
  *
  * Соответствующий выходной файл:
 ///////////////////////////////начало файла/////////////////////////////////////////////////////////////////////////////
 <html>
-  <body>
-    <p>
-      <ul>
-        <li>
-          Утка по-пекински
-          <ul>
-            <li>Утка</li>
-            <li>Соус</li>
-          </ul>
-        </li>
-        <li>
-          Салат Оливье
-          <ol>
-            <li>Мясо
-              <ul>
-                <li>Или колбаса</li>
-              </ul>
-            </li>
-            <li>Майонез</li>
-            <li>Картофель</li>
-            <li>Что-то там ещё</li>
-          </ol>
-        </li>
-        <li>Помидоры</li>
-        <li>Фрукты
-          <ol>
-            <li>Бананы</li>
-            <li>Яблоки
-              <ol>
-                <li>Красные</li>
-                <li>Зелёные</li>
-              </ol>
-            </li>
-          </ol>
-        </li>
-      </ul>
-    </p>
-  </body>
+<body>
+<p>
+<ul>
+<li>
+Утка по-пекински
+<ul>
+<li>Утка</li>
+<li>Соус</li>
+</ul>
+</li>
+<li>
+Салат Оливье
+<ol>
+<li>Мясо
+<ul>
+<li>Или колбаса</li>
+</ul>
+</li>
+<li>Майонез</li>
+<li>Картофель</li>
+<li>Что-то там ещё</li>
+</ol>
+</li>
+<li>Помидоры</li>
+<li>Фрукты
+<ol>
+<li>Бананы</li>
+<li>Яблоки
+<ol>
+<li>Красные</li>
+<li>Зелёные</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+</p>
+</body>
 </html>
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
@@ -450,7 +450,6 @@ class HtlmConverter(private var htmlTabs: String, outputFile: String) {
         for ((line, closetTabs) in closets.reversed()) {
             if (closetTabs.length < defaultTabs.length || closetTabs == "@") break
             htmlTabs = htmlTabs.substring(0, htmlTabs.length - 2)
-            val close = closets.last()
             writer.write(line)
             writer.newLine()
             closets.removeLast()
@@ -572,7 +571,74 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
+// Не знаю зачем подгонять условие задачи под какое-то решение, но тут явно именно это и происходило
+class Divider constructor(private val divisor: Int, number: Int) {
+    private val number: String
+    private val path = mutableListOf<String>()
+    private var remainder: String
+    private var result: String
+
+    private fun decrement() {
+        var tabs = path.last().length - remainder.length + 1
+        path.add("${getTab(tabs)}$remainder")
+        val dec = remainder.toInt() / divisor * divisor
+        tabs = if (remainder.length == dec.toString().length) tabs - 1 else tabs
+        path.add("${getTab(tabs)}-$dec")
+        addLines(dec.toString().length, tabs)
+        result += remainder.toInt() / divisor
+        remainder = (remainder.toInt() - dec).toString()
+    }
+
+    private fun getTab(amount: Int): String {
+        var output = ""
+        if (amount == 0) return output
+        for (i in 1..amount) {
+            output += ' '
+        }
+        return output
+    }
+
+    private fun addLines(amount: Int, tab: Int) {
+        var string = ""
+        for (i in 0..amount)
+            string += "-"
+        path.add("${getTab(tab)}$string")
+    }
+
+    fun printProcess(outputName: String) {
+        for (digit in number) {
+            remainder += digit
+            decrement()
+        }
+        path.add("${getTab(path.last().length - remainder.length)}$remainder")
+        path[1] = path[1] + getTab(path[0].length - path[1].length - divisor.toString().length) + result
+        val writer = File(outputName).bufferedWriter()
+        for (line in path) {
+            writer.write(line)
+            writer.newLine()
+        }
+        writer.close()
+    }
+
+    init {
+        path.add(" $number | $divisor")
+        //first operation
+        var firstToDivide = ""
+        for (digit in number.toString()) {
+            firstToDivide += digit
+            if (firstToDivide.toInt() >= divisor) break
+        }
+        result = (firstToDivide.toInt() / divisor).toString()
+        remainder = (firstToDivide.toInt() % divisor).toString()
+        val dec = firstToDivide.toInt() - remainder.toInt()
+        path.add("-${dec}")
+        addLines(dec.toString().length, 0)
+        this.number = number.toString().substring(firstToDivide.length)
+    }
+}
+
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    val divider = Divider(rhv, lhv)
+    divider.printProcess(outputName)
 }
 

@@ -160,12 +160,8 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.
  */
 fun times(a: List<Int>, b: List<Int>): Int {
-    val newList = mutableListOf<Int>()
     if (a.isEmpty() || b.isEmpty()) return 0
-    for (i in 0 until min(a.size, b.size)) {
-        newList.add((a[i] * b[i]))
-    }
-    return newList.sum()
+    return a.zip(b) { a, b -> a * b }.sum()
 }
 
 /**
@@ -240,21 +236,8 @@ fun factorize(n: Int): List<Int> {
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
 fun factorizeToString(n: Int): String {
-    var number = n
-    var list = ""
-    tailrec fun divider(counter: Int) {
-        if (counter == number) return
-        if (number % counter == 0) {
-            list += "$counter*"
-            number /= counter
-            divider(2)
-            return
-        }
-        divider(counter + 1)
-    }
-    divider(2)
-    list += number.toString()
-    return list
+    val list = factorize(n).toString()
+    return list.substring(1, list.length - 1).replace(", ", "*")
 }
 
 /**
@@ -292,18 +275,11 @@ fun convert(n: Int, base: Int): List<Int> {
  */
 fun convertToString(n: Int, base: Int): String {
     var result = ""
-    fun divider(number: Int) {
-        if (number < base) {
-            if (number % base > 9) result += ('a' + (number % base) - 10)
-            else result += number % base
-            return
-        }
-        if (number % base > 9) result += ('a' + (number % base) - 10)
-        else result += number % base
-        divider(number / base)
+    convert(n, base).forEach {
+        if (it % base > 9) result += ('a' + (it % base) - 10)
+        else result += it % base
     }
-    divider(n)
-    return result.reversed()
+    return result
 }
 
 /**
@@ -336,16 +312,11 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * (например, str.toInt(base)), запрещается.
  */
 fun decimalFromString(str: String, base: Int): Int {
-    var result = 0
-    var coif = 1
-    str.reversed().forEach {
-        val x: Int
-        x = if (!it.isDigit()) (it - 'a') + 10
+    val newStr = str.map {
+        if (!it.isDigit()) (it - 'a') + 10
         else it.toString().toInt()
-        result += x * coif
-        coif *= base
-    }
-    return result
+    }.toList()
+    return decimal(newStr, base)
 }
 
 /**
@@ -356,11 +327,12 @@ fun decimalFromString(str: String, base: Int): Int {
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
+val list =
+    mapOf(Pair(1, "I"), Pair(5, "V"), Pair(10, "X"), Pair(50, "L"), Pair(100, "C"), Pair(500, "D"), Pair(1000, "M"))
+
 fun roman(n: Int): String {
     var koef = 1
     var result = ""
-    val list =
-        mapOf(Pair(1, "I"), Pair(5, "V"), Pair(10, "X"), Pair(50, "L"), Pair(100, "C"), Pair(500, "D"), Pair(1000, "M"))
 
     fun getRomanNumber(number: Int, times: Int): String {
         var output = ""
@@ -393,31 +365,32 @@ fun roman(n: Int): String {
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
+val numbers =
+    mapOf(
+        Pair(1, "один"),
+        Pair(2, "два"),
+        Pair(3, "три"),
+        Pair(4, "четыре"),
+        Pair(5, "пять"),
+        Pair(6, "шесть"),
+        Pair(7, "семь"),
+        Pair(8, "восемь"),
+        Pair(9, "девять")
+    )
+val otherNumbers =
+    mapOf(
+        Pair(11, "одиннадцать"),
+        Pair(12, "двенадцать"),
+        Pair(13, "тринадцать"),
+        Pair(14, "четырнадцать"),
+        Pair(15, "пятнадцать"),
+        Pair(16, "шестнадцать"),
+        Pair(17, "семнадцать"),
+        Pair(18, "восемнадцать"),
+        Pair(19, "девятнадцать")
+    )
+
 fun russian(n: Int): String {
-    val numbers =
-        mapOf(
-            Pair(1, "один"),
-            Pair(2, "два"),
-            Pair(3, "три"),
-            Pair(4, "четыре"),
-            Pair(5, "пять"),
-            Pair(6, "шесть"),
-            Pair(7, "семь"),
-            Pair(8, "восемь"),
-            Pair(9, "девять")
-        )
-    val otherNumbers =
-        mapOf(
-            Pair(11, "одиннадцать"),
-            Pair(12, "двенадцать"),
-            Pair(13, "тринадцать"),
-            Pair(14, "четырнадцать"),
-            Pair(15, "пятнадцать"),
-            Pair(16, "шестнадцать"),
-            Pair(17, "семнадцать"),
-            Pair(18, "восемнадцать"),
-            Pair(19, "девятнадцать")
-        )
 
     fun getHundred(number: Int): String = when (number) {
         1 -> "сто"
