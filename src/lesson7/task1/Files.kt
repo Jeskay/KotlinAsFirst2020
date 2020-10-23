@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import java.io.File
+import java.lang.Integer.max
 import java.util.*
 
 // Урок 7: работа с файлами
@@ -631,8 +632,8 @@ class Divider constructor(private val divisor: Int, number: Int) {
         result = (firstToDivide.toInt() / divisor).toString()
         remainder = (firstToDivide.toInt() % divisor).toString()
         val dec = firstToDivide.toInt() - remainder.toInt()
-        path.add("-${dec}")
-        addLines(dec.toString().length, 0)
+        if (dec != 0) path.add("-${dec}") else path.add("${getTab(number.toString().length - 1)}-$dec")
+        addLines(max(dec.toString().length, remainder.length), 0)
         this.number = number.toString().substring(firstToDivide.length)
     }
 }
