@@ -623,7 +623,7 @@ class Divider constructor(private val divisor: Int, number: Int) {
     }
 
     init {
-        path.add(" $number | $divisor")
+        path.add("$number | $divisor")
         //first operation
         var firstToDivide = ""
         for (digit in number.toString()) {
@@ -633,8 +633,9 @@ class Divider constructor(private val divisor: Int, number: Int) {
         result = (firstToDivide.toInt() / divisor).toString()
         remainder = (firstToDivide.toInt() % divisor).toString()
         val dec = firstToDivide.toInt() - remainder.toInt()
+        if (firstToDivide.length == dec.toString().length) path[0] = " " + path[0]
         if (dec == 0) {
-            if (number > 9)path[0] = path[0].substring(1)
+
             path.add("${getTab(number.toString().length - 2)}-$dec")
         } else path.add("-${dec}")
         addLines(max(dec.toString().length + 1, remainder.length), 0)
