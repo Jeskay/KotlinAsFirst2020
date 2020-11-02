@@ -2,6 +2,7 @@
 
 package lesson6.task1
 
+import lesson2.task2.daysInMonth
 import java.lang.IllegalArgumentException
 import kotlin.math.max
 
@@ -77,61 +78,37 @@ fun main() {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-class BullShitException(message: String?, reason: Any) : Exception(message) {
-    private val Reason = reason
+class BullShitException(message: String?, private val reason: Any) : Exception(message) {
     override val message: String?
-        get() = "Shity $Reason caused ${super.message}"
+        get() = "Shity $reason caused ${super.message}"
 }
+fun checkMonth(number: Int, month: Int, year: Int): Boolean = number in 1..daysInMonth(month, year)
+val months = mapOf(
+    "января" to 1,
+    "февряля" to 2,
+    "марта" to 3,
+    "апреля" to 4,
+    "мая" to 5,
+    "июня" to 6,
+    "июля" to 7,
+    "августа" to 8,
+    "сентября" to 9,
+    "октября" to 10,
+    "ноября" to 11,
+    "декабря" to 12
+)
 
 fun dateStrToDigit(str: String): String {
     val input = str.split(" ")
     var result = ""
-    fun checkMonth(number: Int, month: Int): Boolean = when {
-        month == 1 && number in 1..31 -> true
-        month == 2 && number in 1..29 -> true
-        month == 3 && number in 1..31 -> true
-        month == 4 && number in 1..30 -> true
-        month == 5 && number in 1..31 -> true
-        month == 6 && number in 1..30 -> true
-        month == 7 && number in 1..31 -> true
-        month == 8 && number in 1..31 -> true
-        month == 9 && number in 1..30 -> true
-        month == 10 && number in 1..31 -> true
-        month == 11 && number in 1..30 -> true
-        month == 12 && number in 1..31 -> true
-        else -> false
-    }
-
-    fun getMonth(month: String): Int? = when (month) {
-        "января" -> 1
-        "февраля" -> 2
-        "марта" -> 3
-        "апреля" -> 4
-        "мая" -> 5
-        "июня" -> 6
-        "июля" -> 7
-        "августа" -> 8
-        "сентября" -> 9
-        "октября" -> 10
-        "ноября" -> 11
-        "декабря" -> 12
-        else -> null
-    }
     try {
         if (input.size != 3) throw BullShitException("invalid data input", "stupid user")
-        val month = getMonth(input[1])
-        if (month == 2) {
-            val year = input[2].toInt()
-            if ((year % 400 == 0) || (year % 100 != 0 && year % 4 == 0)) {
-                if (input[0].toInt() !in 1..29) throw BullShitException("invalid data input", "stupid user")
-            } else if (input[0].toInt() !in 1..28) throw BullShitException("invalid data input", "stupid user")
-
-        }
-        if (month == null) throw BullShitException("invalid data input", "stupid user")
-        if (checkMonth(input[0].toInt(), month))
-            result = String.format("%02d.%02d.%d", input[0].toInt(), month, input[2].toInt())
-    } catch (e: Exception) {
-
+        val month = months[input[1]] ?: throw BullShitException("invalid month input", "stupid user")
+        val year = input[2].toInt()
+        if (checkMonth(input[0].toInt(), month, year))
+            result = String.format("%02d.%02d.%d", input[0].toInt(), month, year)
+    } catch (e: Throwable) {
+        result = ""
     } finally {
         return result
     }
@@ -148,55 +125,17 @@ fun dateStrToDigit(str: String): String {
  * входными данными.
  */
 fun dateDigitToStr(digital: String): String {
-    fun checkMonth(number: Int, month: Int): Boolean = when {
-        month == 1 && number in 1..31 -> true
-        month == 2 && number in 1..29 -> true
-        month == 3 && number in 1..31 -> true
-        month == 4 && number in 1..30 -> true
-        month == 5 && number in 1..31 -> true
-        month == 6 && number in 1..30 -> true
-        month == 7 && number in 1..31 -> true
-        month == 8 && number in 1..31 -> true
-        month == 9 && number in 1..30 -> true
-        month == 10 && number in 1..31 -> true
-        month == 11 && number in 1..30 -> true
-        month == 12 && number in 1..31 -> true
-        else -> false
-    }
-
-    fun getMonth(month: Int): String? = when (month) {
-        1 -> "января"
-        2 -> "февраля"
-        3 -> "марта"
-        4 -> "апреля"
-        5 -> "мая"
-        6 -> "июня"
-        7 -> "июля"
-        8 -> "августа"
-        9 -> "сентября"
-        10 -> "октября"
-        11 -> "ноября"
-        12 -> "декабря"
-        else -> null
-    }
-
     var result = ""
     try {
         val input = digital.split(".")
         if (input.size != 3) throw BullShitException("invalid data input", "stupid user")
-        val month = getMonth(input[1].toInt())
-        if (input[1].toInt() == 2) {
-            val year = input[2].toInt()
-            if ((year % 400 == 0) || (year % 100 != 0 && year % 4 == 0)) {
-                if (input[0].toInt() !in 1..29) throw BullShitException("invalid data input", "stupid user")
-            } else if (input[0].toInt() !in 1..28) throw BullShitException("invalid data input", "stupid user")
-
-        }
+        val month = months.filterValues { it == input[1].toInt() }.keys.firstOrNull()
+        val year = input[2].toInt()
         if (month == null) throw BullShitException("invalid data input", "stupid user")
-        if (checkMonth(input[0].toInt(), input[1].toInt()))
-            result = String.format("%d %s %d", input[0].toInt(), month, input[2].toInt())
+        if (checkMonth(input[0].toInt(), input[1].toInt(), year))
+            result = String.format("%d %s %d", input[0].toInt(), month, year)
     } catch (e: Exception) {
-
+        result = ""
     } finally {
         return result
     }

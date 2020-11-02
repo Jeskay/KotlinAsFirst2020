@@ -4,7 +4,6 @@ package lesson7.task1
 
 import java.io.File
 import java.lang.Integer.max
-import java.lang.Math.min
 import java.util.*
 
 // Урок 7: работа с файлами
@@ -415,54 +414,55 @@ class InputString constructor(input: String) {
     }
 }
 
-data class Closet(val line: String, val defaultTabs: String)
+data class LineToClose(val line: String, val defaultTabs: String)
+data class Tag(val open: String, val close: String)
 
 class HtlmConverter(private var htmlTabs: String, outputFile: String) {
-    private val closets = Stack<Closet>()
+    private val linesToClose = Stack<LineToClose>()
     private val writer = File(outputFile).bufferedWriter()
 
     fun next(string: InputString, defaultTabs: String, prevDefaultTabs: String) {
-        val tag = if (string.prefix == "*") Pair("<ul>", "</ul>") else Pair("<ol>", "</ol>")
+        val tag = if (string.prefix == "*") Tag("<ul>", "</ul>") else Tag("<ol>", "</ol>")
         //That's for list
         htmlTabs += "  "
         writer.newLine()
-        writer.write(htmlTabs + tag.first)
-        closets.push(Closet(htmlTabs + tag.second, prevDefaultTabs))
+        writer.write(htmlTabs + tag.open)
+        linesToClose.push(LineToClose(htmlTabs + tag.close, prevDefaultTabs))
         // That's for item
         htmlTabs += "  "
         writer.newLine()
         writer.write(htmlTabs + "<li>" + string.content)
-        closets.push(Closet("$htmlTabs</li>", defaultTabs))
+        linesToClose.push(LineToClose("$htmlTabs</li>", defaultTabs))
         // Closing list
 
     }
 
     fun current(string: InputString, defaultTabs: String) {
-        val close = closets.last()
-        closets.remove(close)
+        val close = linesToClose.last()
+        linesToClose.remove(close)
         writer.write(close.line.substringAfterLast(' '))
         writer.newLine()
         //That's next line
         writer.write(htmlTabs + "<li>" + string.content)
-        closets.push(Closet("$htmlTabs</li>", defaultTabs))
+        linesToClose.push(LineToClose("$htmlTabs</li>", defaultTabs))
     }
 
     fun back(string: InputString, defaultTabs: String) {
         //Closing all tags until we get the current level
-        for ((line, closetTabs) in closets.reversed()) {
+        for ((line, closetTabs) in linesToClose.reversed()) {
             if (closetTabs.length < defaultTabs.length || closetTabs == "@") break
             htmlTabs = htmlTabs.substring(0, htmlTabs.length - 2)
             writer.write(line)
             writer.newLine()
-            closets.removeLast()
+            linesToClose.removeLast()
         }
         //Writing current item
         writer.write(htmlTabs + "<li>" + string.content)
-        closets.push(Closet("$htmlTabs</li>", defaultTabs))
+        linesToClose.push(LineToClose("$htmlTabs</li>", defaultTabs))
     }
 
     fun close() {
-        for ((line, closeTabs) in closets.reversed()) {
+        for ((line, closeTabs) in linesToClose.reversed()) {
             writer.write(line)
             writer.newLine()
         }
@@ -625,6 +625,9 @@ class Divider constructor(private val divisor: Int, number: Int) {
     init {
         path.add("$number | $divisor")
         //first operation
+        //Вот это прям очень дикая дичь но из-за того что тут мы делим не как нормальные люди то я другого решения не нашел.
+        // До сих пор не понимаю почему нам нельзя отнять сразу минимальный множитель от остатка,
+        // а нужно по кусочкам собирать его отнимая нули, хотя при первом делении мы так не делаем.
         var firstToDivide = ""
         for (digit in number.toString()) {
             firstToDivide += digit

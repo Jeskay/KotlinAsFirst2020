@@ -4,13 +4,6 @@ package lesson5.task1
 
 import java.lang.Integer.min
 import java.lang.Math.max
-import java.lang.Math.random
-import java.sql.Time
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.util.*
-import kotlin.concurrent.schedule
-import kotlin.random.Random
 
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
@@ -186,12 +179,9 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
 fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
     val result = mutableMapOf<String, String>()
     result.putAll(mapA)
-    for ((key, value1) in mapB) {
-        result.getOrPut(key) { value1 }
-        if (result[key] != value1) result[key] += ", $value1"
-//        if (!result.containsKey(key))
-//            result.put(key, value1)
-//        else if (result[key]!! != value1) result[key] += ", $value1"
+    for ((key, value) in mapB) {
+        result.getOrPut(key) { value }
+        if (result[key] != value) result[key] += ", $value"
     }
     return result
 }
@@ -295,11 +285,10 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    val sorted = mutableListOf<Set<Char>>()
+    val sorted = mutableSetOf<Set<Char>>()
     for (item in words) {
         val set = item.toSortedSet()
-        if (sorted.contains(set)) return true
-        else sorted.add(set)
+        if (!sorted.add(set)) return true
     }
     return false
 }
@@ -387,19 +376,6 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     return Pair(-1, -1)
 }
 
-fun TreasureTester(elements: Int, capacity: Int): Map<String, Pair<Int, Int>> {
-    val result = mutableMapOf<String, Pair<Int, Int>>()
-    for (number in 0..elements) {
-        result.put(
-            number.toString(),
-            Pair(
-                (0..capacity).random(),
-                (0..capacity).random()
-            )
-        )
-    }
-    return result
-}
 
 /**
  * Очень сложная (8 баллов)
@@ -424,8 +400,7 @@ fun TreasureTester(elements: Int, capacity: Int): Map<String, Pair<Int, Int>> {
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     var maximum = Pair(emptySet<String>(), -1)
-    val timeRemain = LocalTime.now()
-    val treasuresList = listOf<String>("").plus(treasures.keys.toList())
+    val treasuresList = listOf("").plus(treasures.keys.toList())
     fun find(): Set<String> {
         val arr: Array<Array<Int>> = Array(treasures.size + 1) { Array(capacity + 1) { 0 } }
         //setting up some shit
@@ -462,21 +437,16 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         list: List<String>
     ) {
         for ((key, value) in leftTreasures) {
-            if (LocalTime.now().toSecondOfDay() - timeRemain.toSecondOfDay() > 10) return
             if (value.first <= freeCapacity) {
-                val newcapacity = freeCapacity - value.first
-                val newvulnerability = vulnerability + value.second
+                val newCapacity = freeCapacity - value.first
+                val newVulnerability = vulnerability + value.second
                 val newTreasures = leftTreasures.minus(key)
                 val newList = list.plus(key)
-                findList(newcapacity, newvulnerability, newTreasures, newList)
+                findList(newCapacity, newVulnerability, newTreasures, newList)
             }
         }
         if (vulnerability > maximum.second) maximum = Pair(list.toSet(), vulnerability)
     }
 
     return find()
-    /* else {
-        findList(capacity, 0, treasures, mutableListOf<String>())
-        maximum.first
-    }*/
 }
