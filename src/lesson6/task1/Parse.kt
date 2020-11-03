@@ -85,7 +85,7 @@ class BullShitException(message: String?, private val reason: Any) : Exception(m
 fun checkMonth(number: Int, month: Int, year: Int): Boolean = number in 1..daysInMonth(month, year)
 val months = mapOf(
     "января" to 1,
-    "февряля" to 2,
+    "февраля" to 2,
     "марта" to 3,
     "апреля" to 4,
     "мая" to 5,
