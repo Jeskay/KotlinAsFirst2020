@@ -164,8 +164,9 @@ fun flattenPhoneNumber(phone: String): String {
     }
     val input = phone.filter { !ignore.contains(it) }
     val toTest = input.filter { it != '+' }
+    if (toTest.isEmpty()) return ""
     toTest.forEach {
-        if (it.toInt() !in 48..57) return ""
+        if (it !in '0'..'9') return ""
     }
     return input
 }
