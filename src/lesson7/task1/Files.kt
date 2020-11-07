@@ -404,7 +404,7 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
 ///////////////////////////////конец файла//////////////////////////////////////////////////////////////////////////////
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-class InputString constructor(input: String) {
+class InputString(input: String) {
     var prefix: String = ""
     var content: String = ""
 
@@ -415,14 +415,16 @@ class InputString constructor(input: String) {
 }
 
 data class LineToClose(val line: String, val defaultTabs: String)
-data class Tag(val open: String, val close: String)
+data class Tag(val open: String, val close: String) {
+    constructor(tag: String) : this("<$tag>", "</$tag>")
+}
 
 class HtlmConverter(private var htmlTabs: String, outputFile: String) {
     private val linesToClose = Stack<LineToClose>()
     private val writer = File(outputFile).bufferedWriter()
 
     fun next(string: InputString, defaultTabs: String, prevDefaultTabs: String) {
-        val tag = if (string.prefix == "*") Tag("<ul>", "</ul>") else Tag("<ol>", "</ol>")
+        val tag = if (string.prefix == "*") Tag("ul") else Tag("ol")
         //That's for list
         htmlTabs += "  "
         writer.newLine()

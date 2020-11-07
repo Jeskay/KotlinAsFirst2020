@@ -107,7 +107,7 @@ fun dateStrToDigit(str: String): String {
         val year = input[2].toInt()
         if (checkMonth(input[0].toInt(), month, year))
             result = String.format("%02d.%02d.%d", input[0].toInt(), month, year)
-    } catch (e: Throwable) {
+    } catch (e: BullShitException) {
         result = ""
     } finally {
         return result
@@ -134,7 +134,7 @@ fun dateDigitToStr(digital: String): String {
         if (month == null) throw BullShitException("invalid data input", "stupid user")
         if (checkMonth(input[0].toInt(), input[1].toInt(), year))
             result = String.format("%d %s %d", input[0].toInt(), month, year)
-    } catch (e: Exception) {
+    } catch (e: BullShitException) {
         result = ""
     } finally {
         return result
@@ -192,7 +192,7 @@ fun bestLongJump(jumps: String): Int {
                 try {
                     val number = fragment.toInt()
                     maximum = max(number, maximum)
-                } catch (e: Exception) {
+                } catch (e: NumberFormatException) {
                     maximum = -1
                     break
                 }
@@ -258,7 +258,7 @@ fun mostExpensive(description: String): String {
             val cost = product[1].toDouble()
             if (maxCost.second < cost) maxCost = Pair(product[0], cost)
         }
-    } catch (e: Exception) {
+    } catch (e: BullShitException) {
         maxCost = Pair("", -1.0)
     } finally {
         return maxCost.first
@@ -316,7 +316,7 @@ fun fromRoman(roman: String): Int {
     return try {
         if (roman.isEmpty()) throw BullShitException("user", "Empty input")
         getNumber(roman, -1, -2)
-    } catch (e: Exception) {
+    } catch (e: BullShitException) {
         -1
     }
 }
