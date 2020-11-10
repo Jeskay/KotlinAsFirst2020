@@ -13,11 +13,13 @@ internal class UnsignedBigIntegerTest {
     fun plus() {
         assertEquals(UnsignedBigInteger(4), UnsignedBigInteger(2) + UnsignedBigInteger(2))
         assertEquals(UnsignedBigInteger("9087654330"), UnsignedBigInteger("9087654329") + UnsignedBigInteger(1))
+        assertEquals(UnsignedBigInteger("36119819"), UnsignedBigInteger("35465165") + UnsignedBigInteger(654654))
     }
 
     @Test
     @Tag("8")
     fun minus() {
+        assertEquals(UnsignedBigInteger(82), UnsignedBigInteger(100) - UnsignedBigInteger(18))
         assertEquals(UnsignedBigInteger(2), UnsignedBigInteger(4) - UnsignedBigInteger(2))
         assertEquals(UnsignedBigInteger("9087654329"), UnsignedBigInteger("9087654330") - UnsignedBigInteger(1))
         assertThrows(ArithmeticException::class.java) {
@@ -29,6 +31,10 @@ internal class UnsignedBigIntegerTest {
     @Tag("12")
     fun times() {
         assertEquals(
+            UnsignedBigInteger("98901"),
+            UnsignedBigInteger("999") * UnsignedBigInteger("99")
+        )
+        assertEquals(
             UnsignedBigInteger("18446744073709551616"),
             UnsignedBigInteger("4294967296") * UnsignedBigInteger("4294967296")
         )
@@ -37,6 +43,10 @@ internal class UnsignedBigIntegerTest {
     @Test
     @Tag("16")
     fun div() {
+        assertEquals(
+            UnsignedBigInteger("56"),
+            UnsignedBigInteger("1009") / UnsignedBigInteger("18")
+        )
         assertEquals(
             UnsignedBigInteger("4294967296"),
             UnsignedBigInteger("18446744073709551616") / UnsignedBigInteger("4294967296")

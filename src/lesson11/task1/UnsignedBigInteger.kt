@@ -1,8 +1,8 @@
 package lesson11.task1
 
+import jdk.jfr.Unsigned
 import java.lang.ArithmeticException
 import java.lang.IllegalArgumentException
-import java.math.BigInteger
 
 /**
  * Класс "беззнаковое большое целое число".
@@ -16,81 +16,188 @@ import java.math.BigInteger
  * сравнение на равенство и неравенство
  */
 class UnsignedBigInteger : Comparable<UnsignedBigInteger> {
-    var value: BigInteger
+    var value: String
         set(input) {
-            if (input.signum() == -1) throw IllegalArgumentException()
+            if (input.filterNot { it in '0'..'9' }.isNotEmpty() ||
+                (input.first() == '0' && input.length > 1)
+            )
+                throw IllegalArgumentException()
             field = input
         }
+
+    private class MinMax(first: UnsignedBigInteger, second: UnsignedBigInteger) {
+        var min: String
+        var max: String
+
+        init {
+            if (first > second) {
+                min = second.value.reversed()
+                max = first.value.reversed()
+            } else {
+                min = first.value.reversed()
+                max = second.value.reversed()
+            }
+        }
+    }
+
+    private class Divider() {
+        var remainder = UnsignedBigInteger(0)
+
+        data class DivisionResult(var quotient: Int, var remainder: UnsignedBigInteger)
+
+        fun findDividor(dividend: UnsignedBigInteger, divider: UnsignedBigInteger): DivisionResult {
+            val result = DivisionResult(0, dividend)
+            while (result.remainder > divider) {
+                result.remainder = result.remainder - divider
+                result.quotient++
+            }
+            if (result.remainder == divider) {
+                result.remainder = UnsignedBigInteger(0)
+                result.quotient++
+            }
+            return result
+        }
+
+        fun divide(dividend: UnsignedBigInteger, divider: UnsignedBigInteger): UnsignedBigInteger {
+            var result = ""
+            if (dividend < divider) {
+                remainder = dividend
+                return UnsignedBigInteger(0)
+            }
+            var part = ""
+            for (digit in dividend.value) {
+                part += digit
+                val res = findDividor(UnsignedBigInteger(part), divider)
+                if (res.quotient != 0) {
+                    result += res.quotient
+                    part = res.remainder.toString()
+                } else if (result.isNotEmpty()) result += res.quotient
+            }
+            remainder = UnsignedBigInteger(part)
+            return UnsignedBigInteger(result)
+        }
+    }
+
+    private fun zero(amount: Int): String {
+        if (amount == 0) return ""
+        var output = ""
+        for (i in 0 until amount)
+            output += '0'
+        return output
+    }
+
+    private fun simpleOperation(input: UnsignedBigInteger, operation: Int): UnsignedBigInteger {
+        val numbers = MinMax(this, input)
+        var result = ""
+        var extra = 0
+        for (position in numbers.max.indices) {
+            val toAdd = numbers.min.getOrElse(position) { '0' }.toString().toInt() + extra
+            val res = numbers.max[position].toString().toInt() + toAdd * operation
+            if (res >= 0) {
+                result += res % 10
+                extra = res / 10
+            } else {
+                result += 10 + res
+                extra = 1
+            }
+        }
+        if (extra != 0) result += extra
+        result = result.reversed()
+        for (index in result.indices)
+            if (result.getOrNull(index) == '0')
+                result = result.substringAfter(result[index])
+            else break
+        return UnsignedBigInteger(result)
+    }
 
     /**
      * Конструктор из строки
      */
     constructor(s: String) {
-        try {
-            value = BigInteger(s)
-        } catch (e: NumberFormatException) {
-            throw IllegalArgumentException()
-        }
+        value = s
     }
 
     /**
      * Конструктор из целого
      */
     constructor(i: Int) {
-        value = i.toBigInteger()
-    }
-
-    /*
-    * Конструктор из BigInteger
-    * по-моему логично, что он должен быть, хотя можно было наследовать от него.
-    * Но что-то мне не хочется копаться в джава коде BigInteger ради этого, тем более что джаву я не знаю
-    */
-    private constructor(bigInt: BigInteger) {
-        value = bigInt
+        value = i.toString()
     }
 
     /**
      * Сложение
      */
-    operator fun plus(other: UnsignedBigInteger): UnsignedBigInteger = UnsignedBigInteger(this.value + other.value)
+    operator fun plus(other: UnsignedBigInteger): UnsignedBigInteger = simpleOperation(other, 1)
 
     /**
      * Вычитание (бросить ArithmeticException, если this < other)
      */
     operator fun minus(other: UnsignedBigInteger): UnsignedBigInteger {
-        if (this.value < other.value) throw ArithmeticException()
-        return UnsignedBigInteger(this.value - other.value)
+        if (this < other) throw ArithmeticException()
+        return simpleOperation(other, -1)
     }
 
     /**
      * Умножение
      */
-    operator fun times(other: UnsignedBigInteger): UnsignedBigInteger = UnsignedBigInteger(this.value * other.value)
+    operator fun times(other: UnsignedBigInteger): UnsignedBigInteger {
+        val numbers = MinMax(this, other)
+        var sum = UnsignedBigInteger(0)
+        for ((coefficient, position) in numbers.min.indices.withIndex()) {
+            var part = ""
+            var extra = 0
+            for (digit in numbers.max) {
+                val partToAdd = numbers.min[position].toString().toInt() * digit.toString().toInt() + extra
+                part += partToAdd % 10
+                extra = partToAdd / 10
+            }
+            if (extra != 0) part += extra
+            sum += UnsignedBigInteger(part.reversed() + zero(coefficient))
+        }
+        return sum
+    }
 
     /**
      * Деление
      */
-    operator fun div(other: UnsignedBigInteger): UnsignedBigInteger = UnsignedBigInteger(this.value / other.value)
+    operator fun div(other: UnsignedBigInteger): UnsignedBigInteger {
+        val divider = Divider()
+        return divider.divide(this, other)
+    }
 
     /**
      * Взятие остатка
      */
-    operator fun rem(other: UnsignedBigInteger): UnsignedBigInteger = UnsignedBigInteger(this.value % other.value)
+    operator fun rem(other: UnsignedBigInteger): UnsignedBigInteger {
+        val divider = Divider()
+        divider.divide(this, other)
+        return divider.remainder
+    }
 
     /**
      * Сравнение на равенство (по контракту Any.equals)
      */
-    override fun equals(other: Any?): Boolean = other is UnsignedBigInteger && other.value == this.value
+    override fun equals(other: Any?): Boolean = other is UnsignedBigInteger && this.value == other.value
 
     /**
      * Сравнение на больше/меньше (по контракту Comparable.compareTo)
      */
-    override fun compareTo(other: UnsignedBigInteger): Int = this.value.compareTo(other.value)
+    override fun compareTo(other: UnsignedBigInteger): Int {
+        if (this.value.length > other.value.length) return 1
+        else if (this.value.length < other.value.length) return -1
+        else {
+            for (position in this.value.indices) {
+                if (this.value[position].toInt() > other.value[position].toInt()) return 1
+                if (this.value[position].toInt() < other.value[position].toInt()) return -1
+            }
+            return 0
+        }
+    }
 
     /**
      * Преобразование в строку
      */
-    override fun toString(): String = this.value.toString()
+    override fun toString(): String = this.value
 
     /**
      * Преобразование в целое
