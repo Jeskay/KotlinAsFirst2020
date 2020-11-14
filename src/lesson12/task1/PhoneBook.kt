@@ -19,7 +19,7 @@ package lesson12.task1
  */
 class PhoneBook {
     private val phones: MutableMap<String, String> = mutableMapOf()
-    private val people: MutableMap<String, MutableSet<String>?> = mutableMapOf()
+    private val people: MutableMap<String, MutableSet<String>> = mutableMapOf()
 
     /**
      * Добавить человека.
@@ -29,7 +29,7 @@ class PhoneBook {
      */
     fun addHuman(name: String): Boolean {
         if (people.containsKey(name)) return false
-        people[name] = null
+        people[name] = mutableSetOf()
         return true
     }
 
@@ -102,7 +102,5 @@ class PhoneBook {
         return this.people == otherBook.people
     }
 
-    override fun hashCode(): Int {
-        return people.hashCode() + phones.hashCode()
-    }
+    override fun hashCode(): Int = people.hashCode() + phones.hashCode()
 }

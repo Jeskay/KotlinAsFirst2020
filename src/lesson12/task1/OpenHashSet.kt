@@ -21,32 +21,58 @@ class OpenHashSet<T>(val capacity: Int) {
      * Массив для хранения элементов хеш-таблицы
      */
     internal val elements = Array<Any?>(capacity) { null }
+    private val hashCodes: Array<Int?>
+        get() = elements.filterNotNull().map { it.hashCode() }
+            .toTypedArray()// вообще хз как красиво изменить массив без цикла
+
+    private fun findSlot(): Int? {
+        for (index in elements.indices)
+            if (elements[index] == null) return index
+        return null
+    }
 
     /**
      * Число элементов в хеш-таблице
      */
-    val size: Int get() = TODO()
+    val size: Int get() = elements.filterNotNull().size
 
     /**
      * Признак пустоты
      */
-    fun isEmpty(): Boolean = TODO()
+    fun isEmpty(): Boolean = elements.filterNotNull().isEmpty()
 
     /**
      * Добавление элемента.
      * Вернуть true, если элемент был успешно добавлен,
      * или false, если такой элемент уже был в таблице, или превышена вместимость таблицы.
      */
-    fun add(element: T): Boolean = TODO()
+    fun add(element: T): Boolean {
+        if (this.size == capacity) return false
+        //anti-collision check, mb I'l finish it somehow
+        if (elements.contains(element)) return false
+        if (hashCodes.contains(element.hashCode())) return false
+        val index = findSlot() ?: return false
+        elements[index] = element
+        hashCodes[index] = element.hashCode()
+        return true
+    }
 
     /**
      * Проверка, входит ли заданный элемент в хеш-таблицу
      */
-    operator fun contains(element: T): Boolean = TODO()
+    operator fun contains(element: T): Boolean = elements.contains(element)
 
     /**
      * Таблицы равны, если в них одинаковое количество элементов,
      * и любой элемент из второй таблицы входит также и в первую
      */
-    override fun equals(other: Any?): Boolean = TODO()
+    override fun equals(other: Any?): Boolean {
+        if (other !is OpenHashSet<*>) return false
+        if (this.size != other.size) return false
+        for (element in elements)
+            if (!other.elements.contains(element)) return false
+        return true
+    }
+
+    override fun hashCode(): Int = hashCodes.filterNotNull().sum().hashCode()
 }
